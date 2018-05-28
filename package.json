@@ -1,0 +1,19 @@
+{
+    "name": "Vreo-Contracts",
+    "version": "1.0.0",
+    "description": "Vreo Solidity Smart Contracts",
+    "author": "Sicos",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Vreo/vreo-contracts.git"
+    },
+    "dependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "chai-bignumber": "^2.0.2",
+        "solhint": "^1.2.1",
+        "truffle": "^4.1.11",
+        "truffle-flattener": "^1.2.5"
+    }
+}
