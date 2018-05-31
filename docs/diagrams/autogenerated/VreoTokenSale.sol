@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 import "FinalizableCrowdsale.sol";
 import "MintedCrowdsale.sol";
@@ -58,15 +58,15 @@ contract VreoTokenSale is FinalizableCrowdsale, MintedCrowdsale {
         require(IMPLEMENTATION);
     }
 
-    /// @dev Validate investor
-    /// @param _investor An Ethereum address
-    function validateInvestor(address _investor) public onlyOwner {
+    /// @dev Validate investors
+    /// @param _investors A list where each entry is an Ethereum address
+    function validateInvestors(address[] _investors) public onlyOwner {
         require(IMPLEMENTATION);
     }
 
-    /// @dev Invalidate investor
-    /// @param _investor An Ethereum address
-    function invalidateInvestor(address _investor) public onlyOwner {
+    /// @dev Invalidate investors
+    /// @param _investors A list where each entry is an Ethereum address
+    function invalidateInvestors(address[] _investors) public onlyOwner {
         require(IMPLEMENTATION);
     }
 

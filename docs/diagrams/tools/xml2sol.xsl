@@ -11,7 +11,7 @@
   
   <xsl:param name="directory"/>
   <xsl:param name="version">
-    <xsl:text>0.4.23</xsl:text>
+    <xsl:text>^0.4.0</xsl:text>
   </xsl:param>
   
   <xsl:variable name="indent1">
@@ -343,6 +343,10 @@
     <xsl:apply-templates select="parameter"/>
     <xsl:text>)</xsl:text>
     <xsl:choose>
+      <xsl:when test="visibility='public' and 
+                      ../stereotype='interface'">
+        <xsl:text> external</xsl:text>
+      </xsl:when>
       <xsl:when test="visibility='public'">
         <xsl:text> public</xsl:text>
       </xsl:when>

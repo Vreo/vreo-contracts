@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 
 /// @title WhitelistInterface
@@ -8,7 +8,7 @@ interface WhitelistInterface {
     /// @dev Is whitelisted
     /// @param _account An Ethereum address
     /// @return True or false
-    function isWhitelisted(address _account) public view returns (bool);
+    function isWhitelisted(address _account) external view returns (bool);
 
 }
 
