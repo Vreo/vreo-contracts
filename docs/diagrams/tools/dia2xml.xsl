@@ -86,15 +86,15 @@
   </xsl:template>
   
   <xsl:template match="dia:connection[@handle=0]">
-    <xsl:attribute name="to">
+    <xsl:element name="to">
       <xsl:value-of select="@to"/>
-    </xsl:attribute>
+    </xsl:element>
   </xsl:template>
   
   <xsl:template match="dia:connection[@handle=1]">
-    <xsl:attribute name="from">
+    <xsl:element name="from">
       <xsl:value-of select="@to"/>
-    </xsl:attribute>
+    </xsl:element>
   </xsl:template>
   
   <xsl:template match="dia:composite[@type='umlattribute']">

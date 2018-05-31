@@ -29,7 +29,9 @@
           mode="files"
           select="diagram/class[
             not(package) and
-            (not(stereotype) or stereotype='library')]"/>
+            (not(stereotype) or 
+             stereotype='interface' or 
+             stereotype='library')]"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>pragma solidity </xsl:text>
@@ -38,7 +40,9 @@
         <xsl:apply-templates
           select="diagram/class[
             not(package) and
-            (not(stereotype) or stereotype='library')]"/>
+            (not(stereotype) or 
+             stereotype='interface' or 
+             stereotype='library')]"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -47,16 +51,19 @@
     <xsl:variable name="name" select="name"/>
     <xsl:variable name="dependency-unary-count">
       <xsl:choose>
-        <xsl:when test="//generalization[@from=current()/@id]">
+        <xsl:when test="//generalization[from=current()/@id]">
           <xsl:text>*</xsl:text>
         </xsl:when>
-        <xsl:when test="//realization[@from=current()/@id]">
+        <xsl:when test="//realization[from=current()/@id]">
           <xsl:text>*</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="//association[@to=current()/@id]">
-            <xsl:variable name="id" select="@from"/>
-            <xsl:if test="//class[@id=$id and (not(stereotype) or stereotype='library')]">
+          <xsl:for-each select="//association[to=current()/@id]">
+            <xsl:variable name="id" select="from"/>
+            <xsl:if test="//class[@id=$id and 
+                                  (not(stereotype) or 
+                                   stereotype='interface' or 
+                                   stereotype='library')]">
               <xsl:text>*</xsl:text>
             </xsl:if>
           </xsl:for-each>
@@ -72,9 +79,9 @@
         <xsl:text>&#xa;</xsl:text>
         <!-- due to inheritance -->
         <xsl:for-each select="
-            //generalization[@from=current()/@id]|
-            //realization[@from=current()/@id]">
-          <xsl:variable name="id" select="@to"/>
+            //generalization[from=current()/@id]|
+            //realization[from=current()/@id]">
+          <xsl:variable name="id" select="to"/>
           <xsl:variable name="node" select="//class[@id=$id]"/>
           <xsl:text>import &quot;</xsl:text>
           <xsl:if test="not($node/package)">
@@ -84,10 +91,12 @@
           <xsl:text>.sol&quot;;&#xa;</xsl:text>
         </xsl:for-each>
         <!-- due to usage -->
-        <xsl:for-each select="//association[@to=current()/@id]">
-          <xsl:variable name="id" select="@from"/>
+        <xsl:for-each select="//association[to=current()/@id]">
+          <xsl:variable name="id" select="from"/>
           <xsl:variable name="node" select="//class[@id=$id]"/>
-          <xsl:if test="not($node/stereotype) or $node/stereotype='library'">
+          <xsl:if test="not($node/stereotype) or 
+                        $node/stereotype='interface' or 
+                        $node/stereotype='library'">
             <xsl:text>import &quot;</xsl:text>
             <xsl:if test="not($node/package)">
               <xsl:text>./</xsl:text>
@@ -119,9 +128,9 @@
           abstract and 
           not(attribute) and 
           count(operator/abstract)=count(operator) and
-          not(//generalization[@from=current()/@id]) and
-          not(//realization[@from=current()/@id]) and
-          not(//association[@to=current()/@id])">
+          not(//generalization[from=current()/@id]) and
+          not(//realization[from=current()/@id]) and
+          not(//association[to=current()/@id])">
         <xsl:text>interface </xsl:text>
       </xsl:when>
       <xsl:otherwise>
@@ -131,9 +140,9 @@
     <xsl:value-of select="name"/>
     <!-- inheritance -->
     <xsl:for-each select="
-        //generalization[@from=current()/@id]|
-        //realization[@from=current()/@id]">
-      <xsl:variable name="id" select="@to"/>
+        //generalization[from=current()/@id]|
+        //realization[from=current()/@id]">
+      <xsl:variable name="id" select="to"/>
       <xsl:choose>
         <xsl:when test="position()=1">
           <xsl:text> is </xsl:text>
@@ -146,8 +155,8 @@
     </xsl:for-each>
     <xsl:text> {&#xa;</xsl:text>
     <!-- typedefs -->
-    <xsl:for-each select="//association[@to=current()/@id]">
-      <xsl:variable name="id" select="@from"/>
+    <xsl:for-each select="//association[to=current()/@id]">
+      <xsl:variable name="id" select="from"/>
       <xsl:variable name="node" select="//class[@id=$id]"/>
       <xsl:if test="$node/stereotype='struct' or $node/stereotype='enum'">
         <xsl:apply-templates select="$node"/>
