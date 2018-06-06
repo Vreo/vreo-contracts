@@ -3,7 +3,7 @@ pragma solidity 0.4.24;
 import "FinalizableCrowdsale.sol";
 import "MintedCrowdsale.sol";
 import "./VreoTokenBounty.sol";
-import "./WhitelistInterface.sol";
+import "./IconiqInterface.sol";
 
 
 /// @title VreoTokenSale
@@ -20,16 +20,21 @@ contract VreoTokenSale is FinalizableCrowdsale, MintedCrowdsale {
     uint public TOKEN_SHARE_OF_ADVISORS = 58000000e18; // =  58.000.000 e18
     uint public TOKEN_SHARE_OF_LEGALS = 57000000e18; // =  57.000.000 e18
     uint public TOKEN_SHARE_OF_BOUNTY = 50000000e18; // =  50.000.000 e18
-    uint public TOTAL_TOKEN_CAP_FOR_SALE = 450000000e18; // = 450.000.000 e18
-    uint public EXTRA_TOKEN_PERCENTAGE_ICONIQ = 20;
-    uint public EXTRA_TOKEN_PERCENTAGE_PRESALE = 15;
-    uint public iconiqSaleOpeningTime;
-    uint public iconiqSaleClosingTime;
-    uint public vreoPresaleOpeningTime;
-    uint public vreoPresaleClosingTime;
-    uint public publicSaleOpeningTime;
-    uint public publicSaleClosingTime;
-    WhitelistInterface public whitelist;
+    uint public TOTAL_TOKEN_CAP_OF_SALE = 450000000e18; // = 450.000.000 e18
+    uint public EXTRA_TOKEN_PCT_IN_ICONIQ_SALE = 20;
+    uint public EXTRA_TOKEN_PCT_IN_VREO_PRESALE = 15;
+    uint public MINIMUM_KYC_VERIFICATION_PERIOD = 14 days;
+    uint public remainingTokensForSale;
+    uint public openingTimeOfIconiqSale;
+    uint public closingTimeOfIconiqSale;
+    uint public openingTimeOfVreoPresale;
+    uint public closingTimeOfVreoPresale;
+    uint public openingTimeOfPublicSale;
+    uint public closingTimeOfPublicSale;
+    IconiqInterface public iconiq;
+    address public teamAccount;
+    address public advisorsAccount;
+    address public legalsAccount;
     VreoTokenBounty public bounty;
     mapping(address => Investment) public investments;
 
@@ -45,6 +50,11 @@ contract VreoTokenSale is FinalizableCrowdsale, MintedCrowdsale {
     /// @param investor An Ethereum address
     event InvestorFalsified(address investor);
 
+    /// @dev Log entry on tokens delivered
+    /// @param investor An Ethereum address
+    /// @param amount A positive number
+    event TokensDelivered(address investor, uint amount);
+
     /// @dev Log entry on withdrawn
     /// @param investor An Ethereum address
     /// @param value A positive number
@@ -53,22 +63,31 @@ contract VreoTokenSale is FinalizableCrowdsale, MintedCrowdsale {
 
     /// @dev Constructor
     /// @param _token A VreoToken
-    /// @param _iconiqSaleOpeningTime A positive number
-    /// @param _iconiqSaleClosingTime A positive number
-    /// @param _vreoPresaleOpeningTime A positive number
-    /// @param _vreoPresaleClosingTime A positive number
-    /// @param _publicSaleOpeningTime A positive number
-    /// @param _publicSaleClosingTime A positive number
+    /// @param _openingTimeOfIconiqSale A positive number
+    /// @param _closingTimeOfIconiqSale A positive number
+    /// @param _openingTimeOfVreoPresale A positive number
+    /// @param _closingTimeOfVreoPresale A positive number
+    /// @param _openingTimeOfPublicSale A positive number
+    /// @param _closingTimeOfPublicSale A positive number
     /// @param _rate A positive number
-    /// @param _whitelist A WhitelistInterface
+    /// @param _iconiq An IconiqInterface
+    /// @param _teamAccount An Ethereum address
+    /// @param _advisorsAccount An Ethereum address
+    /// @param _legalsAccount An Ethereum address
     /// @param _bounty A VreoTokenBounty
     /// @param _wallet An Ethereum address
-    constructor(VreoToken _token, uint _iconiqSaleOpeningTime, uint _iconiqSaleClosingTime, uint _vreoPresaleOpeningTime, uint _vreoPresaleClosingTime, uint _publicSaleOpeningTime, uint _publicSaleClosingTime, uint _rate, WhitelistInterface _whitelist, VreoTokenBounty _bounty, address _wallet) public Crowdsale(_rate, _wallet, _token) TimedCrowdsale(_openingTime, _closingTime) {
+    constructor(VreoToken _token, uint _openingTimeOfIconiqSale, uint _closingTimeOfIconiqSale, uint _openingTimeOfVreoPresale, uint _closingTimeOfVreoPresale, uint _openingTimeOfPublicSale, uint _closingTimeOfPublicSale, uint _rate, IconiqInterface _iconiq, address _teamAccount, address _advisorsAccount, address _legalsAccount, VreoTokenBounty _bounty, address _wallet) public Crowdsale(_rate, _wallet, _token) TimedCrowdsale(_openingTimeOfIconiqSale, _closingTimeOfPublicSale) {
         require(IMPLEMENTATION);
     }
 
     /// @dev Destroy
     function destroy() public onlyOwner {
+        require(IMPLEMENTATION);
+    }
+
+    /// @dev Set rate
+    /// @param _newRate A positive number
+    function setRate(uint _newRate) public onlyOwner {
         require(IMPLEMENTATION);
     }
 
@@ -84,20 +103,15 @@ contract VreoTokenSale is FinalizableCrowdsale, MintedCrowdsale {
         require(IMPLEMENTATION);
     }
 
-    /// @dev Set rate
-    /// @param _newRate A positive number
-    function setRate(uint _newRate) public onlyOwner {
-        require(IMPLEMENTATION);
-    }
-
-    /// @dev Buy tokens
-    /// @param _beneficiary An Ethereum address
-    function buyTokens(address _beneficiary) public payable {
-        require(IMPLEMENTATION);
-    }
-
     /// @dev Withdraw
     function withdraw() public {
+        require(IMPLEMENTATION);
+    }
+
+    /// @dev Fulfil investment
+    /// @param _investor An Ethereum address
+    /// @param _investment An Investment
+    function fulfilInvestment(address _investor, Investment _investment) internal {
         require(IMPLEMENTATION);
     }
 
