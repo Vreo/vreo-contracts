@@ -19,11 +19,5 @@ contract VreoToken is CappedToken, PausableToken, BurnableToken {
         require(IMPLEMENTATION);
     }
 
-    /// @dev Burn
-    /// @param _value A positive number
-    function burn(uint _value) public whenNotPaused {
-        require(IMPLEMENTATION);
-    }
-
 }
 

@@ -83,15 +83,14 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Process purchase
-    /// @param _beneficiary An Ethereum address
+    // @param _beneficiary An Ethereum address
     /// @param _tokenAmount A positive number
-    function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
+    function _processPurchase(address, uint _tokenAmount) internal {
         if (investments[msg.sender].isVerified) {
             _deliverTokens(msg.sender, _tokenAmount);
 
             emit TokensDelivered(msg.sender, _tokenAmount);
-        }
-        else {
+        } else {
             investments[msg.sender].weiAmount = msg.value;
             investments[msg.sender].tokenAmount = _tokenAmount;
         }

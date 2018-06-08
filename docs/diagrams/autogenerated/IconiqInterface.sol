@@ -6,9 +6,9 @@ pragma solidity 0.4.24;
 interface IconiqInterface {
 
     /// @dev Is allowed
-    /// @param _account An Ethereum address
+    /// @param _investor An Ethereum address
     /// @return True or false
-    function isAllowed(address _account) external view returns (bool);
+    function isAllowed(address _investor) external view returns (bool);
 
 }
 

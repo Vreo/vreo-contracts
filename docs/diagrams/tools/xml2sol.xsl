@@ -411,8 +411,10 @@
     <xsl:call-template name="type">
       <xsl:with-param name="name" select="type"/>
     </xsl:call-template>
-    <xsl:text> </xsl:text>
-    <xsl:value-of select="name"/>
+    <xsl:if test="string-length(name)&gt;0">
+      <xsl:text> </xsl:text>
+      <xsl:value-of select="name"/>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template match="node()|@*"/>

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  6 JUN 2018 14:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  8 JUN 2018 17:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1053,64 +1053,64 @@ Chapter 2.
 [2
 
 ]
-Underfull \vbox (badness 10000) detected at line 429
- []
-
-
-Overfull \vbox (3.29312pt too high) detected at line 429
- []
-
-[3]
-Underfull \vbox (badness 10000) detected at line 429
- []
-
-
-Overfull \vbox (3.29312pt too high) detected at line 429
- []
-
-[4]
-Underfull \vbox (badness 10000) detected at line 429
- []
-
-
-Overfull \vbox (14.29312pt too high) detected at line 429
- []
-
-[5]
-Underfull \vbox (badness 10000) detected at line 429
- []
-
-
-Overfull \vbox (3.29312pt too high) detected at line 429
- []
-
-[6] [7]
 Chapter 3.
-[8
+[3
 
 ]
+Underfull \vbox (badness 10000) detected at line 261
+ []
+
+
+Overfull \vbox (3.29312pt too high) detected at line 261
+ []
+
+[4] [5]
 Chapter 4.
-No file Sources.ind.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 501.
-[9
+[6
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 501.
+Underfull \vbox (badness 10000) detected at line 444
+ []
+
+
+Overfull \vbox (3.29312pt too high) detected at line 444
+ []
+
+[7]
+Underfull \vbox (badness 10000) detected at line 444
+ []
+
+
+Overfull \vbox (3.29312pt too high) detected at line 444
+ []
+
+[8] [9]
+Chapter 5.
+[10
+
+]
+Chapter 6.
+No file Sources.ind.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 507.
+[11
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 507.
  (./Sources.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 501.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 501.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 507.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 507.
 Package rerunfilecheck Info: File `Sources.out' has not changed.
-(rerunfilecheck)             Checksum: 29C9261F21993FF8713C2E7D1040E734;432.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 501.
+(rerunfilecheck)             Checksum: 01B754603B822311495315C9FDD76CDE;698.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 507.
  ) 
 Here is how much of TeX's memory you used:
- 13333 strings out of 493093
- 184087 string characters out of 6138119
- 658053 words of memory out of 5000000
- 16527 multiletter control sequences out of 15000+600000
+ 13343 strings out of 493093
+ 184313 string characters out of 6138119
+ 526746 words of memory out of 5000000
+ 16533 multiletter control sequences out of 15000+600000
  36921 words of font info for 53 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 37i,11n,45p,369b,459s stack positions out of 5000i,2500n,10000p,300000b,80000s
+ 37i,11n,45p,430b,459s stack positions out of 5000i,2500n,10000p,300000b,80000s
 {/usr/local/share/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}{/usr/lo
 cal/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/share/texmf-dist/f
 onts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/share/texmf-dist
@@ -1118,10 +1118,10 @@ onts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/share/texmf-dist
 pe1/public/amsfonts/cm/cmsy5.pfb></usr/local/share/texmf-dist/fonts/type1/urw/h
 elvetic/uhvb8a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8
 a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on Sources.pdf (11 pages, 76144 bytes).
+Output written on Sources.pdf (13 pages, 79782 bytes).
 PDF statistics:
- 111 PDF objects out of 1000 (max. 8388607)
- 86 compressed objects within 1 object stream
- 17 named destinations out of 1000 (max. 500000)
- 53 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 132 PDF objects out of 1000 (max. 8388607)
+ 104 compressed objects within 2 object streams
+ 21 named destinations out of 1000 (max. 500000)
+ 69 words of extra memory for PDF output out of 10000 (max. 10000000)
 

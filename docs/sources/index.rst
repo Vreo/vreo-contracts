@@ -10,6 +10,8 @@ TokenPlatform's Solidity Sources
    :maxdepth: 2
 
    _contracts/VreoToken
+   _contracts/TokenCappedCrowdsale
+   _contracts/PostKYCCrowdsale
    _contracts/VreoTokenSale
    _contracts/VreoTokenBounty
    _contracts/IconiqInterface

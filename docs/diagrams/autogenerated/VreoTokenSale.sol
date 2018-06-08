@@ -4,7 +4,6 @@ import "./PostKYCCrowdsale.sol";
 import "./TokenCappedCrowdsale.sol";
 import "FinalizableCrowdsale.sol";
 import "MintedCrowdsale.sol";
-import "./VreoTokenBounty.sol";
 import "./IconiqInterface.sol";
 
 
@@ -17,19 +16,22 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
     uint public TOKEN_SHARE_OF_ADVISORS = 58000000e18; // =  58.000.000 e18
     uint public TOKEN_SHARE_OF_LEGALS = 57000000e18; // =  57.000.000 e18
     uint public TOKEN_SHARE_OF_BOUNTY = 50000000e18; // =  50.000.000 e18
-    uint public KYC_VERIFICATION_PERIOD = 14 days;
-    uint public MINIMUM_LIFETIME = 365 days;
-    uint public iconiqSaleOpeningTime;
-    uint public iconiqSaleClosingTime;
-    uint public vreoSaleOpeningTime;
-    uint public vreoSaleBonus20EndTime;
-    uint public vreoSaleBonus10EndTime;
-    uint public vreoSaleClosingTime;
+    uint public BONUS_PCT_IN_ICONIQ_SALE = 20;
+    uint public BONUS_PCT_IN_VREO_SALE_PHASE_1 = 20;
+    uint public BONUS_PCT_IN_VREO_SALE_PHASE_2 = 10;
+    uint public ICONIQ_SALE_OPENING_TIME = 1530432000; // 2018-07-01 10:00:00 CEST
+    uint public ICONIQ_SALE_CLOSING_TIME = 1531598400; // 2018-07-14 22:00:00 CEST
+    uint public VREO_SALE_OPENING_TIME  = 1532160000; // 2018-07-21 10:00:00 CEST
+    uint public VREO_SALE_PHASE_1_END_TIME = 1532462400; // 2018-07-24 22:00:00 CEST
+    uint public VREO_SALE_PHASE_2_END_TIME = 1533153600; // 2018-08-01 22:00:00 CEST
+    uint public VREO_SALE_CLOSING_TIME = 1534622400; // 2018-08-18 22:00:00 CEST
+    uint public KYC_VERIFICATION_END_TIME = 1535832000; // 2018-09-01 22:00:00 CEST
+    uint public MINIMUM_LIFETIME_AFTER_END = 365 days;
     IconiqInterface public iconiq;
-    address public teamAccount;
-    address public advisorsAccount;
-    address public legalsAccount;
-    VreoTokenBounty public bounty;
+    address public teamAddress;
+    address public advisorsAddress;
+    address public legalsAddress;
+    address public bountyAddress;
 
     /// @dev Log entry on rate changed
     /// @param newRate A positive number
@@ -37,20 +39,14 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
 
     /// @dev Constructor
     /// @param _token A VreoToken
-    /// @param _iconiqSaleOpeningTime A positive number
-    /// @param _iconiqSaleClosingTime A positive number
-    /// @param _vreoSaleOpeningTime A positive number
-    /// @param _vreoSaleBonus20EndTime A positive number
-    /// @param _vreoSaleBonus10EndTime A positive number
-    /// @param _vreoSaleClosingTime A positive number
     /// @param _rate A positive number
     /// @param _iconiq An IconiqInterface
-    /// @param _teamAccount An Ethereum address
-    /// @param _advisorsAccount An Ethereum address
-    /// @param _legalsAccount An Ethereum address
-    /// @param _bounty A VreoTokenBounty
+    /// @param _teamAddress An Ethereum address
+    /// @param _advisorsAddress An Ethereum address
+    /// @param _legalsAddress An Ethereum address
+    /// @param _bountyAddress An Ethereum address
     /// @param _wallet An Ethereum address
-    constructor(VreoToken _token, uint _iconiqSaleOpeningTime, uint _iconiqSaleClosingTime, uint _vreoSaleOpeningTime, uint _vreoSaleBonus20EndTime, uint _vreoSaleBonus10EndTime, uint _vreoSaleClosingTime, uint _rate, IconiqInterface _iconiq, address _teamAccount, address _advisorsAccount, address _legalsAccount, VreoTokenBounty _bounty, address _wallet) public Crowdsale(_rate, _wallet, _token) TimedCrowdsale(_iconiqSaleOpeningTime, _vreoSaleClosingTime) TokenCappedCrowdsale(TOTAL_TOKEN_CAP_OF_SALE) {
+    constructor(VreoToken _token, uint _rate, IconiqInterface _iconiq, address _teamAddress, address _advisorsAddress, address _legalsAddress, address _bountyAddress, address _wallet) public Crowdsale(_rate, _wallet, _token) TimedCrowdsale(_iconiqSaleOpeningTime, _vreoSaleClosingTime) TokenCappedCrowdsale(TOTAL_TOKEN_CAP_OF_SALE) {
         require(IMPLEMENTATION);
     }
 
@@ -59,16 +55,16 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
         require(IMPLEMENTATION);
     }
 
-    /// @dev Set rate
-    /// @param _newRate A positive number
-    function setRate(uint _newRate) public onlyOwner {
-        require(IMPLEMENTATION);
-    }
-
     /// @dev Distribute presale
     /// @param _investors A list where each entry is an Ethereum address
     /// @param _amounts A list where each entry is a positive number
     function distributePresale(address[] _investors, uint[] _amounts) public onlyOwner {
+        require(IMPLEMENTATION);
+    }
+
+    /// @dev Set rate
+    /// @param _newRate A positive number
+    function setRate(uint _newRate) public onlyOwner {
         require(IMPLEMENTATION);
     }
 
