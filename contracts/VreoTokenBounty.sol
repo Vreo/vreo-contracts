@@ -10,11 +10,6 @@ contract VreoTokenBounty is Ownable {
 
     VreoToken public token;
 
-    /// @dev Log entry on token distributed
-    /// @param recipient An Ethereum address
-    /// @param amount A positive number
-    event TokenDistributed(address recipient, uint amount);
-
     /// @dev Constructor
     /// @param _token A VreoToken
     constructor(VreoToken _token) public {
@@ -30,11 +25,7 @@ contract VreoTokenBounty is Ownable {
         require(_recipients.length == _amounts.length);
 
         for (uint i = 0; i < _recipients.length; ++i) {
-            require(_amounts[i] <= token.balanceOf(this));  // TODO: superfluous
-
             token.transfer(_recipients[i], _amounts[i]);
-
-            emit TokenDistributed(_recipients[i], _amounts[i]);
         }
     }
 

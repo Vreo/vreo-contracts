@@ -10,8 +10,8 @@ import "BurnableToken.sol";
 contract VreoToken is CappedToken, PausableToken, BurnableToken {
 
     uint public TOTAL_TOKEN_CAP = 700000000e18; // = 700.000.000 e18
-    string public name = "Vreo MTC";
-    string public symbol = "MTC";
+    string public name = "MERO Token";
+    string public symbol = "MERO";
     uint8 public decimals = 18;
 
     /// @dev Constructor
