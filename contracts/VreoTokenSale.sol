@@ -142,12 +142,12 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
         // Iconiq sale period
         if (ICONIQ_SALE_OPENING_TIME <= now && now <= ICONIQ_SALE_CLOSING_TIME) {
             // How many MEROs the investor purchased so far
-            uint balance;
+            uint vreoBalance;
             if (investments[_investor].isVerified) {
-                balance = token.balanceOf(_investor);
+                vreoBalance = token.balanceOf(_investor);
             }
             else {
-                balance = investments[_investor].tokenAmount;
+                vreoBalance = investments[_investor].tokenAmount;
             }
 
             // Ensure the investor has Iconiq tokens
@@ -156,16 +156,14 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
                 return 0;
             }
 
-            // Calculate prorata limit
+            // Calculate prorata limit and ensure the investor didn't reach his quota
             uint prorataLimit = TOTAL_TOKEN_CAP_OF_SALE.mul(iconiqBalance).div(iconiqTotalEstimate);
-
-            // Did the investor already reached his prorata limit?
-            if (balance >= prorataLimit) {
+            if (vreoBalance >= prorataLimit) {
                 return 0;
             }
 
             // How many additional MEROs the investor can buy.
-            uint tokenLimit = prorataLimit - balance;
+            uint tokenLimit = prorataLimit - vreoBalance;  // Dev: no overflow possible
             if (tokenLimit > remainingTokens) {
                 tokenLimit = remainingTokens;
             }
