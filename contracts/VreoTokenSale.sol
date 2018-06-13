@@ -1,5 +1,6 @@
 pragma solidity 0.4.24;
 
+import "../zeppelin/token/ERC20/ERC20Basic.sol";
 import "../zeppelin/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "../zeppelin/crowdsale/emission/MintedCrowdsale.sol";
 import "./TokenCappedCrowdsale.sol";
@@ -42,6 +43,8 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
     address public advisorsAddress;
     address public legalsAddress;
     address public bountyAddress;
+
+    uint iconiqTotalEstimate;
 
     /// @dev Log entry on rate changed
     /// @param newRate A positive number
@@ -90,6 +93,8 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
         advisorsAddress = _advisorsAddress;
         legalsAddress = _legalsAddress;
         bountyAddress = _bountyAddress;
+
+        iconiqTotalEstimate = ERC20Basic(iconiq).totalSupply();  // - iconiqBurned - iconiqShares ...
     }
 
     /// @dev Destroy
@@ -146,7 +151,7 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
             }
 
             // Prorata limit
-            uint iconiqBalance = iconiq.balanceOf(_investor);
+            uint iconiqBalance = ERC20Basic(iconiq).balanceOf(_investor);
             uint prorataLimit = TOTAL_TOKEN_CAP_OF_SALE.mul(iconiqBalance).div(iconiqTotalEstimate);
 
             // Did the investor already reached his prorata limit?
@@ -189,7 +194,7 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
 
         uint maximumPossibleInvestment = getMaximumPossibleInvestment(msg.sender);
 
-        require(0 < maximumPossibleInvestent && _weiAmount <= maximumPossibleInvestment);
+        require(0 < maximumPossibleInvestment && _weiAmount <= maximumPossibleInvestment);
 
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
