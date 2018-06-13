@@ -170,24 +170,29 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
                 tokenLimit = remainingTokens;
             }
 
-            return tokenLimit.div(rate.mul((100 + BONUS_PCT_IN_ICONIQ_SALE) / 100));
+            return tokenLimit.div(getEffectiveRate());
         }
 
         // Vreo sale period
         if (VREO_SALE_OPENING_TIME <= now && now <= VREO_SALE_CLOSING_TIME) {
-            if (now <= VREO_SALE_PHASE_1_END_TIME) {
-                return remainingTokens.div(rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_1) / 100));
-            }
-
-            if (now <= VREO_SALE_PHASE_2_END_TIME) {
-                return remainingTokens.div(rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_2) / 100));
-            }
-
-            return remainingTokens.div(rate);
+            return remainingTokens.div(getEffectiveRate());
         }
 
         // Outside of any sale period
         return 0;
+    }
+
+    function getEffectiveRate() internal view returns (uint) {
+        if (now <= ICONIQ_SALE_CLOSING_TIME) {
+            return rate.mul((100 + BONUS_PCT_IN_ICONIQ_SALE) / 100);
+        }
+        if (now <= VREO_SALE_PHASE_1_END_TIME) {
+            return rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_1) / 100);
+        }
+        if (now <= VREO_SALE_PHASE_2_END_TIME) {
+            return rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_2) / 100);
+        }
+        return rate;
     }
 
     /// @dev Pre validate purchase
@@ -208,21 +213,7 @@ contract VreoTokenSale is PostKYCCrowdsale, TokenCappedCrowdsale, FinalizableCro
     /// @param _weiAmount A positive number
     /// @return A positive number
     function _getTokenAmount(uint _weiAmount) internal view returns (uint) {
-        uint amount = super._getTokenAmount(_weiAmount);
-
-        if (now <= ICONIQ_SALE_CLOSING_TIME) {
-            return amount.mul(100 + BONUS_PCT_IN_ICONIQ_SALE).div(100);
-        }
-
-        if (now <= VREO_SALE_PHASE_1_END_TIME) {
-            return amount.mul(100 + BONUS_PCT_IN_VREO_SALE_PHASE_1).div(100);
-        }
-
-        if (now <= VREO_SALE_PHASE_2_END_TIME) {
-            return amount.mul(100 + BONUS_PCT_IN_VREO_SALE_PHASE_2).div(100);
-        }
-
-        return amount;  // No bonus
+        return _weiAmount.mul(getEffectiveRate());
     }
 
     /// @dev Finalization
