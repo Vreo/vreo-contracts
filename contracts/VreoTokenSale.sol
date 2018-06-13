@@ -3,7 +3,6 @@ pragma solidity 0.4.24;
 import "../zeppelin/token/ERC20/ERC20Basic.sol";
 import "../zeppelin/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "../zeppelin/crowdsale/emission/MintedCrowdsale.sol";
-import "./TokenCappedCrowdsale.sol";
 import "./PostKYCCrowdsale.sol";
 import "./IconiqInterface.sol";
 import "./VreoToken.sol";
@@ -44,8 +43,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     address public legalsAddress;
     address public bountyAddress;
 
-    uint public iconiqTotalEstimate;
     uint public remainingTokensForSale;
+    uint public iconiqTotalEstimate;
 
     /// @dev Log entry on rate changed
     /// @param newRate A positive number
@@ -72,7 +71,6 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     )
         public
         Crowdsale(_rate, _wallet, _token)
-        TokenCappedCrowdsale(TOTAL_TOKEN_CAP_OF_SALE)
         TimedCrowdsale(ICONIQ_SALE_OPENING_TIME, VREO_SALE_CLOSING_TIME)
     {
         // Token sanity check
@@ -95,8 +93,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         legalsAddress = _legalsAddress;
         bountyAddress = _bountyAddress;
 
-        iconiqTotalEstimate = ERC20Basic(iconiq).totalSupply();  // - iconiqBurned - iconiqShares ...
         remainingTokensForSale = TOTAL_TOKEN_CAP_OF_SALE;
+        iconiqTotalEstimate = ERC20Basic(iconiq).totalSupply();  // - iconiqBurned - iconiqShares ...
     }
 
     /// @dev Destroy
@@ -120,7 +118,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
             totalAmount = totalAmount.add(_amounts[i]);
         }
 
-        remainingTokens = remainingTokens.sub(totalAmount);
+        remainingTokensForSale = remainingTokensForSale.sub(totalAmount);
     }
 
     /// @dev Set rate
@@ -137,6 +135,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
 
     /// @dev Get maximum possible investment
     /// @param _investor An Ethereum address
+    /// @return A positive number
     function getMaximumPossibleInvestment(address _investor) public view returns (uint) {
         // No tokens available anymore?
         if (remainingTokensForSale == 0) {
@@ -179,6 +178,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Get effective rate
+    /// @return A positive number
     function getEffectiveRate() internal view returns (uint) {
         if (now <= ICONIQ_SALE_CLOSING_TIME) {
             return rate.mul((100 + BONUS_PCT_IN_ICONIQ_SALE) / 100);
