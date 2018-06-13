@@ -146,13 +146,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         // Iconiq sale period
         if (ICONIQ_SALE_OPENING_TIME <= now && now <= ICONIQ_SALE_CLOSING_TIME) {
             // How many MEROs the investor purchased so far
-            uint vreoBalance;
-            if (investments[_investor].isVerified) {
-                vreoBalance = token.balanceOf(_investor);
-            }
-            else {
-                vreoBalance = investments[_investor].tokenAmount;
-            }
+            uint vreoBalance = token.balanceOf(_investor).add(investments[_investor].tokenAmount);
 
             // Ensure the investor has Iconiq tokens
             uint iconiqBalance = ERC20Basic(iconiq).balanceOf(_investor);
