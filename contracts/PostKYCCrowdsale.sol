@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
-import "../zeppelin/ownership/Ownable.sol";
-import "../zeppelin/crowdsale/Crowdsale.sol";
+import "../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../node_modules/zeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
 
 
 /// @title PostKYCCrowdsale
@@ -50,7 +50,7 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
                     _forwardFunds(investment.totalWeiInvested);
                     _deliverTokens(investor, pendingTokenAmount);
 
-                    emit TokensDelivered(investor, pendingTokenAmount);
+                   emit TokensDelivered(investor, pendingTokenAmount);
                 }
             }
         }

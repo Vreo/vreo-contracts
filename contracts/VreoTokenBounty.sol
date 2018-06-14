@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-import "../zeppelin/ownership/Ownable.sol";
+import "../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./VreoToken.sol";
 
 
@@ -30,4 +30,3 @@ contract VreoTokenBounty is Ownable {
     }
 
 }
-

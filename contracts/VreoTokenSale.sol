@@ -1,8 +1,8 @@
 pragma solidity 0.4.24;
 
-import "../zeppelin/token/ERC20/ERC20Basic.sol";
-import "../zeppelin/crowdsale/distribution/FinalizableCrowdsale.sol";
-import "../zeppelin/crowdsale/emission/MintedCrowdsale.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
+import "../node_modules/zeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
+import "../node_modules/zeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "./PostKYCCrowdsale.sol";
 import "./VreoToken.sol";
 
@@ -205,4 +205,3 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
 }
-

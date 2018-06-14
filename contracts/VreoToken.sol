@@ -1,8 +1,8 @@
 pragma solidity 0.4.24;
 
-import "../zeppelin/token/ERC20/CappedToken.sol";
-import "../zeppelin/token/ERC20/PausableToken.sol";
-import "../zeppelin/token/ERC20/BurnableToken.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC20/CappedToken.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC20/PausableToken.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
 
 
 /// @title VreoToken
@@ -26,4 +26,3 @@ contract VreoToken is CappedToken, PausableToken, BurnableToken {
     }
 
 }
-
