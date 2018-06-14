@@ -88,13 +88,13 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     /// @param _tokenAmount A positive number
     function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
         Investment storage investment = investments[msg.sender];
-
+        investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
+        
         if (investment.isVerified) {
             _deliverTokens(_beneficiary, _tokenAmount);
 
             emit TokensDelivered(_beneficiary, _tokenAmount);
         } else {
-            investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
             investment.pendingTokenAmount = investment.pendingTokenAmount.add(_tokenAmount);
         }
     }
