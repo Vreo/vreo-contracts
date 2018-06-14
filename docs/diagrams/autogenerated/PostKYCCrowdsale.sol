@@ -10,8 +10,8 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
 
     struct Investment {
         bool isVerified; // wether or not the investor passed the KYC process
-        uint weiAmount; // invested wei
-        uint tokenAmount; // amount of token quantums the investor wants to purchase
+        uint totalWeiInvested; // invested wei
+        uint pendingTokenAmount; // amount of tokens the investor didn't receive yet
     }
 
     mapping(address => Investment) public investments;
@@ -25,10 +25,10 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     /// @param amount A positive number
     event TokensDelivered(address investor, uint amount);
 
-    /// @dev Log entry on withdrawn
+    /// @dev Log entry on investment withdrawn
     /// @param investor An Ethereum address
     /// @param value A positive number
-    event Withdrawn(address investor, uint value);
+    event InvestmentWithdrawn(address investor, uint value);
 
     /// @dev Verify investors
     /// @param _investors A list where each entry is an Ethereum address
@@ -36,8 +36,8 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
         require(IMPLEMENTATION);
     }
 
-    /// @dev Withdraw
-    function withdraw() public {
+    /// @dev Withdraw investments
+    function withdrawInvestments() public {
         require(IMPLEMENTATION);
     }
 
@@ -49,9 +49,9 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Process purchase
-    /// @param  An Ethereum address
+    /// @param _beneficiary An Ethereum address
     /// @param _tokenAmount A positive number
-    function _processPurchase(address, uint _tokenAmount) internal {
+    function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
         require(IMPLEMENTATION);
     }
 

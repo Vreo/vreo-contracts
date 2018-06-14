@@ -1,7 +1,5 @@
 \select@language {english}
 \contentsline {chapter}{\numberline {1}VreoToken}{1}{chapter.1}
-\contentsline {chapter}{\numberline {2}TokenCappedCrowdsale}{2}{chapter.2}
-\contentsline {chapter}{\numberline {3}PostKYCCrowdsale}{3}{chapter.3}
-\contentsline {chapter}{\numberline {4}VreoTokenSale}{6}{chapter.4}
-\contentsline {chapter}{\numberline {5}VreoTokenBounty}{10}{chapter.5}
-\contentsline {chapter}{\numberline {6}IconiqInterface}{11}{chapter.6}
+\contentsline {chapter}{\numberline {2}PostKYCCrowdsale}{2}{chapter.2}
+\contentsline {chapter}{\numberline {3}VreoTokenSale}{5}{chapter.3}
+\contentsline {chapter}{\numberline {4}VreoTokenBounty}{9}{chapter.4}
