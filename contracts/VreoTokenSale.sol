@@ -35,7 +35,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     uint public constant KYC_VERIFICATION_END_TIME  = 1535832000;  // 2018-09-01 22:00:00 CEST
 
     // Max amount of wei ICONIQ investors can buy per ICONIQ TOKEN_SHARE_OF_TEAM
-    uint public constant WEI_INVESTABLE_PER_ICONIQTOKEN = 1000;
+    uint public constant ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500;
 
 
     ERC20Basic public iconiqToken;
@@ -144,7 +144,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     function getIconiqMaxInvestment(address _investor) public view returns (uint) {
         // Ensure the investor has Iconiq tokens
         uint iconiqBalance = iconiqToken.balanceOf(_investor);
-        uint prorataLimit = iconiqBalance.mul(WEI_INVESTABLE_PER_ICONIQTOKEN);
+        uint prorataLimit = iconiqBalance.div(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
 
         // How many additional MEROs the ICONIQ investor can buy
         return prorataLimit.sub(investments[_investor].totalWeiInvested);
