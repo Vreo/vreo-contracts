@@ -76,13 +76,13 @@
 
 
 \chapter{VreoToken}
-\label{\detokenize{_contracts/VreoToken:tokenplatform-s-solidity-sources}}\label{\detokenize{_contracts/VreoToken:vreotoken}}\label{\detokenize{_contracts/VreoToken::doc}}
+\label{\detokenize{_contracts/VreoToken:vreotoken}}\label{\detokenize{_contracts/VreoToken:tokenplatform-s-solidity-sources}}\label{\detokenize{_contracts/VreoToken::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\},numbers=left,firstnumber=1,stepnumber=1]
 \PYG{k+kr}{pragma} \PYG{n+nx}{solidity} \PYG{l+m+mf}{0.4}\PYG{l+m+mf}{.24}\PYG{p}{;}
 
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/token/ERC20/CappedToken.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/token/ERC20/PausableToken.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/token/ERC20/BurnableToken.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/token/ERC20/CappedToken.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/token/ERC20/PausableToken.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/token/ERC20/BurnableToken.sol\PYGZdq{}}\PYG{p}{;}
 
 
 \PYG{c+c1}{/// @title VreoToken}
@@ -110,12 +110,12 @@
 
 
 \chapter{PostKYCCrowdsale}
-\label{\detokenize{_contracts/PostKYCCrowdsale:postkyccrowdsale}}\label{\detokenize{_contracts/PostKYCCrowdsale::doc}}
+\label{\detokenize{_contracts/PostKYCCrowdsale::doc}}\label{\detokenize{_contracts/PostKYCCrowdsale:postkyccrowdsale}}
 \begin{sphinxVerbatim}[commandchars=\\\{\},numbers=left,firstnumber=1,stepnumber=1]
 \PYG{k+kr}{pragma} \PYG{n+nx}{solidity} \PYG{l+m+mf}{0.4}\PYG{l+m+mf}{.24}\PYG{p}{;}
 
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/ownership/Ownable.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/crowdsale/Crowdsale.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/ownership/Ownable.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/crowdsale/Crowdsale.sol\PYGZdq{}}\PYG{p}{;}
 
 
 \PYG{c+c1}{/// @title PostKYCCrowdsale}
@@ -164,7 +164,7 @@
                     \PYG{n+nx}{\PYGZus{}forwardFunds}\PYG{p}{(}\PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested}\PYG{p}{)}\PYG{p}{;}
                     \PYG{n+nx}{\PYGZus{}deliverTokens}\PYG{p}{(}\PYG{n+nx}{investor}\PYG{p}{,} \PYG{n+nx}{pendingTokenAmount}\PYG{p}{)}\PYG{p}{;}
 
-                    \PYG{k+kr}{emit} \PYG{n+nx}{TokensDelivered}\PYG{p}{(}\PYG{n+nx}{investor}\PYG{p}{,} \PYG{n+nx}{pendingTokenAmount}\PYG{p}{)}\PYG{p}{;}
+                   \PYG{k+kr}{emit} \PYG{n+nx}{TokensDelivered}\PYG{p}{(}\PYG{n+nx}{investor}\PYG{p}{,} \PYG{n+nx}{pendingTokenAmount}\PYG{p}{)}\PYG{p}{;}
                 \PYG{p}{\PYGZcb{}}
             \PYG{p}{\PYGZcb{}}
         \PYG{p}{\PYGZcb{}}
@@ -202,13 +202,13 @@
     \PYG{c+c1}{/// @param \PYGZus{}tokenAmount A positive number}
     \PYG{k+kd}{function} \PYG{n+nx}{\PYGZus{}processPurchase}\PYG{p}{(}\PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}beneficiary}\PYG{p}{,} \PYG{k+kt}{uint} \PYG{n+nx}{\PYGZus{}tokenAmount}\PYG{p}{)} \PYG{k+kr}{internal} \PYG{p}{\PYGZob{}}
         \PYG{n+nx}{Investment} \PYG{k+kd}{storage} \PYG{n+nx}{investment} \PYG{o}{=} \PYG{n+nx}{investments}\PYG{p}{[}\PYG{n+nx}{msg}\PYG{p}{.}\PYG{n+nx}{sender}\PYG{p}{]}\PYG{p}{;}
-
+        \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested} \PYG{o}{=} \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested}\PYG{p}{.}\PYG{n+nx}{add}\PYG{p}{(}\PYG{n+nx}{msg}\PYG{p}{.}\PYG{n+nx}{value}\PYG{p}{)}\PYG{p}{;}
+        
         \PYG{k}{if} \PYG{p}{(}\PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{isVerified}\PYG{p}{)} \PYG{p}{\PYGZob{}}
             \PYG{n+nx}{\PYGZus{}deliverTokens}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}beneficiary}\PYG{p}{,} \PYG{n+nx}{\PYGZus{}tokenAmount}\PYG{p}{)}\PYG{p}{;}
 
             \PYG{k+kr}{emit} \PYG{n+nx}{TokensDelivered}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}beneficiary}\PYG{p}{,} \PYG{n+nx}{\PYGZus{}tokenAmount}\PYG{p}{)}\PYG{p}{;}
         \PYG{p}{\PYGZcb{}} \PYG{k}{else} \PYG{p}{\PYGZob{}}
-            \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested} \PYG{o}{=} \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested}\PYG{p}{.}\PYG{n+nx}{add}\PYG{p}{(}\PYG{n+nx}{msg}\PYG{p}{.}\PYG{n+nx}{value}\PYG{p}{)}\PYG{p}{;}
             \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{pendingTokenAmount} \PYG{o}{=} \PYG{n+nx}{investment}\PYG{p}{.}\PYG{n+nx}{pendingTokenAmount}\PYG{p}{.}\PYG{n+nx}{add}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}tokenAmount}\PYG{p}{)}\PYG{p}{;}
         \PYG{p}{\PYGZcb{}}
     \PYG{p}{\PYGZcb{}}
@@ -233,13 +233,13 @@
 
 
 \chapter{VreoTokenSale}
-\label{\detokenize{_contracts/VreoTokenSale::doc}}\label{\detokenize{_contracts/VreoTokenSale:vreotokensale}}
+\label{\detokenize{_contracts/VreoTokenSale:vreotokensale}}\label{\detokenize{_contracts/VreoTokenSale::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\},numbers=left,firstnumber=1,stepnumber=1]
 \PYG{k+kr}{pragma} \PYG{n+nx}{solidity} \PYG{l+m+mf}{0.4}\PYG{l+m+mf}{.24}\PYG{p}{;}
 
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/token/ERC20/ERC20Basic.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/crowdsale/distribution/FinalizableCrowdsale.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/crowdsale/emission/MintedCrowdsale.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/token/ERC20/ERC20Basic.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/crowdsale/emission/MintedCrowdsale.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}./PostKYCCrowdsale.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}./VreoToken.sol\PYGZdq{}}\PYG{p}{;}
 
@@ -272,7 +272,7 @@
     \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{k+kr}{constant} \PYG{n+nx}{KYC\PYGZus{}VERIFICATION\PYGZus{}END\PYGZus{}TIME}  \PYG{o}{=} \PYG{l+m+mi}{1535832000}\PYG{p}{;}  \PYG{c+c1}{// 2018\PYGZhy{}09\PYGZhy{}01 22:00:00 CEST}
 
     \PYG{c+c1}{// Max amount of wei ICONIQ investors can buy per ICONIQ TOKEN\PYGZus{}SHARE\PYGZus{}OF\PYGZus{}TEAM}
-    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{k+kr}{constant} \PYG{n+nx}{WEI\PYGZus{}INVESTABLE\PYGZus{}PER\PYGZus{}ICONIQTOKEN} \PYG{o}{=} \PYG{l+m+mi}{1000}\PYG{p}{;}
+    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{k+kr}{constant} \PYG{n+nx}{ICONIQ\PYGZus{}TOKENS\PYGZus{}NEEDED\PYGZus{}PER\PYGZus{}INVESTED\PYGZus{}WEI} \PYG{o}{=} \PYG{l+m+mi}{500}\PYG{p}{;}
 
 
     \PYG{n+nx}{ERC20Basic} \PYG{k+kr}{public} \PYG{n+nx}{iconiqToken}\PYG{p}{;}
@@ -381,7 +381,7 @@
     \PYG{k+kd}{function} \PYG{n+nx}{getIconiqMaxInvestment}\PYG{p}{(}\PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}investor}\PYG{p}{)} \PYG{k+kr}{public} \PYG{k+kr}{view} \PYG{k+kr}{returns} \PYG{p}{(}\PYG{k+kt}{uint}\PYG{p}{)} \PYG{p}{\PYGZob{}}
         \PYG{c+c1}{// Ensure the investor has Iconiq tokens}
         \PYG{k+kt}{uint} \PYG{n+nx}{iconiqBalance} \PYG{o}{=} \PYG{n+nx}{iconiqToken}\PYG{p}{.}\PYG{n+nx}{balanceOf}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}investor}\PYG{p}{)}\PYG{p}{;}
-        \PYG{k+kt}{uint} \PYG{n+nx}{prorataLimit} \PYG{o}{=} \PYG{n+nx}{iconiqBalance}\PYG{p}{.}\PYG{n+nx}{mul}\PYG{p}{(}\PYG{n+nx}{WEI\PYGZus{}INVESTABLE\PYGZus{}PER\PYGZus{}ICONIQTOKEN}\PYG{p}{)}\PYG{p}{;}
+        \PYG{k+kt}{uint} \PYG{n+nx}{prorataLimit} \PYG{o}{=} \PYG{n+nx}{iconiqBalance}\PYG{p}{.}\PYG{n+nx}{div}\PYG{p}{(}\PYG{n+nx}{ICONIQ\PYGZus{}TOKENS\PYGZus{}NEEDED\PYGZus{}PER\PYGZus{}INVESTED\PYGZus{}WEI}\PYG{p}{)}\PYG{p}{;}
 
         \PYG{c+c1}{// How many additional MEROs the ICONIQ investor can buy}
         \PYG{k}{return} \PYG{n+nx}{prorataLimit}\PYG{p}{.}\PYG{n+nx}{sub}\PYG{p}{(}\PYG{n+nx}{investments}\PYG{p}{[}\PYG{n+nx}{\PYGZus{}investor}\PYG{p}{]}\PYG{p}{.}\PYG{n+nx}{totalWeiInvested}\PYG{p}{)}\PYG{p}{;}
@@ -446,11 +446,11 @@
 
 
 \chapter{VreoTokenBounty}
-\label{\detokenize{_contracts/VreoTokenBounty::doc}}\label{\detokenize{_contracts/VreoTokenBounty:vreotokenbounty}}
+\label{\detokenize{_contracts/VreoTokenBounty:vreotokenbounty}}\label{\detokenize{_contracts/VreoTokenBounty::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\},numbers=left,firstnumber=1,stepnumber=1]
 \PYG{k+kr}{pragma} \PYG{n+nx}{solidity} \PYG{l+m+mf}{0.4}\PYG{l+m+mf}{.24}\PYG{p}{;}
 
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin/ownership/Ownable.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../node\PYGZus{}modules/zeppelin\PYGZhy{}solidity/contracts/ownership/Ownable.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}./VreoToken.sol\PYGZdq{}}\PYG{p}{;}
 
 

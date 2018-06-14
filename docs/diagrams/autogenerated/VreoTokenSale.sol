@@ -25,7 +25,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     uint public VREO_SALE_PHASE_2_END_TIME = 1533153600; // 2018-08-01 22:00:00 CEST
     uint public VREO_SALE_CLOSING_TIME = 1534622400; // 2018-08-18 22:00:00 CEST
     uint public KYC_VERIFICATION_END_TIME = 1535832000; // 2018-09-01 22:00:00 CEST
-    uint public WEI_INVESTABLE_PER_ICONIQTOKEN = 1000; // TBD
+    uint public ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500; // Estimate, TBD
     ERC20Basic public iconiqToken;
     address public teamAddress;
     address public advisorsAddress;
