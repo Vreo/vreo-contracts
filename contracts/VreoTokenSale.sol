@@ -4,7 +4,6 @@ import "../zeppelin/token/ERC20/ERC20Basic.sol";
 import "../zeppelin/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "../zeppelin/crowdsale/emission/MintedCrowdsale.sol";
 import "./PostKYCCrowdsale.sol";
-import "./IconiqInterface.sol";
 import "./VreoToken.sol";
 
 
@@ -37,14 +36,17 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
 
     uint public constant MINIMUM_LIFETIME_AFTER_END = 365 days;
 
-    IconiqInterface public iconiq;
+    // Max amount of wei ICONIQ investors can buy per ICONIQ TOKEN_SHARE_OF_TEAM
+    uint public constant WEI_INVESTABLE_PER_ICONIQTOKEN = 1000;
+
+
+    ERC20Basic public iconiqToken;
     address public teamAddress;
     address public advisorsAddress;
     address public legalsAddress;
     address public bountyAddress;
 
     uint public remainingTokensForSale;
-    uint public iconiqTotalEstimate;
 
     /// @dev Log entry on rate changed
     /// @param newRate A positive number
@@ -53,7 +55,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     /// @dev Constructor
     /// @param _token A VreoToken
     /// @param _rate A positive number
-    /// @param _iconiq An IconiqInterface
+    /// @param _iconiqToken An IconiqInterface
     /// @param _teamAddress An Ethereum address
     /// @param _advisorsAddress An Ethereum address
     /// @param _legalsAddress An Ethereum address
@@ -62,7 +64,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     constructor(
         VreoToken _token,
         uint _rate,
-        IconiqInterface _iconiq,
+        ERC20Basic _iconiqToken,
         address _teamAddress,
         address _advisorsAddress,
         address _legalsAddress,
@@ -81,20 +83,19 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
                                 + TOKEN_SHARE_OF_BOUNTY);
 
         // Sanity check of addresses
-        require(address(_iconiq) != address(0)
+        require(address(_iconiqToken) != address(0)
                 && _teamAddress != address(0)
                 && _advisorsAddress != address(0)
                 && _legalsAddress != address(0)
                 && _bountyAddress != address(0));
 
-        iconiq = _iconiq;
+        iconiqToken = _iconiqToken;
         teamAddress = _teamAddress;
         advisorsAddress = _advisorsAddress;
         legalsAddress = _legalsAddress;
         bountyAddress = _bountyAddress;
 
         remainingTokensForSale = TOTAL_TOKEN_CAP_OF_SALE;
-        iconiqTotalEstimate = ERC20Basic(iconiq).totalSupply();  // - iconiqBurned - iconiqShares ...
     }
 
     /// @dev Destroy
@@ -133,81 +134,60 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         emit RateChanged(_newRate);
     }
 
-    /// @dev Get maximum possible investment
-    /// @param _investor An Ethereum address
-    /// @return A positive number
-    function getMaximumPossibleInvestment(address _investor) public view returns (uint) {
-        // No tokens available anymore?
-        if (remainingTokensForSale == 0) {
-            return 0;
-        }
+    function withdrawInvestment() public {
+        require(hasClosed());
 
-        // Iconiq sale period
-        if (ICONIQ_SALE_OPENING_TIME <= now && now <= ICONIQ_SALE_CLOSING_TIME) {
-            // How many MEROs the investor purchased so far
-            uint vreoBalance = token.balanceOf(_investor).add(investments[_investor].tokenAmount);
-
-            // Ensure the investor has Iconiq tokens
-            uint iconiqBalance = ERC20Basic(iconiq).balanceOf(_investor);
-            if (iconiqBalance == 0) {
-                return 0;
-            }
-
-            // Calculate prorata limit and ensure the investor didn't reach his quota
-            uint prorataLimit = TOTAL_TOKEN_CAP_OF_SALE.mul(iconiqBalance).div(iconiqTotalEstimate);
-            if (vreoBalance >= prorataLimit) {
-                return 0;
-            }
-
-            // How many additional MEROs the investor can buy
-            uint tokenLimit = prorataLimit - vreoBalance;  // Dev: no overflow possible
-            if (tokenLimit > remainingTokensForSale) {
-                tokenLimit = remainingTokensForSale;
-            }
-
-            return tokenLimit.div(getEffectiveRate());
-        }
-
-        // Vreo sale period
-        if (VREO_SALE_OPENING_TIME <= now && now <= VREO_SALE_CLOSING_TIME) {
-            return remainingTokensForSale.div(getEffectiveRate());
-        }
-
-        // Outside of any sale period
-        return 0;
+        super.withdrawInvestment();
     }
 
-    /// @dev Get effective rate
-    /// @return A positive number
-    function getEffectiveRate() internal view returns (uint) {
-        if (now <= ICONIQ_SALE_CLOSING_TIME) {
-            return rate.mul((100 + BONUS_PCT_IN_ICONIQ_SALE) / 100);
-        }
-        if (now <= VREO_SALE_PHASE_1_END_TIME) {
-            return rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_1) / 100);
-        }
-        if (now <= VREO_SALE_PHASE_2_END_TIME) {
-            return rate.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_2) / 100);
-        }
-        return rate;  // No bonus
+    function iconiqSaleOngoing() public view returns (bool) {
+        return ICONIQ_SALE_OPENING_TIME <= now && now <= ICONIQ_SALE_CLOSING_TIME;
+    }
+
+    function vreoSaleOngoing() public view returns (bool) {
+        return VREO_SALE_OPENING_TIME <= now && now <= VREO_SALE_CLOSING_TIME;
+    }
+
+    /// @dev Get maximum possible wei investment while Iconiq sale
+    /// @param _investor An Ethereum address
+    /// @return Maximum allowed wei investment
+    function getIconiqMaxInvestment(address _investor) public view returns (uint) {
+        // Ensure the investor has Iconiq tokens
+        uint iconiqBalance = iconiqToken.balanceOf(_investor);
+        uint prorataLimit = iconiqBalance.mul(WEI_INVESTABLE_PER_ICONIQTOKEN);
+
+        // How many additional MEROs the ICONIQ investor can buy
+        return prorataLimit.sub(investments[_investor].totalWeiInvested);
     }
 
     /// @dev Pre validate purchase
     /// @param _beneficiary An Ethereum address
     /// @param _weiAmount A positive number
     function _preValidatePurchase(address _beneficiary, uint _weiAmount) internal {
-        uint maximumPossibleInvestment = getMaximumPossibleInvestment(msg.sender);
+        super._preValidatePurchase(_beneficiary, _weiAmount);
 
-        require(0 < maximumPossibleInvestment && _weiAmount <= maximumPossibleInvestment);
-
-        super._preValidatePurchase(_beneficiary, _weiAmount); // Superfluous?
+        require(iconiqSaleOngoing() && getIconiqMaxInvestment(msg.sender) >= _weiAmount || vreoSaleOngoing());
     }
 
     /// @dev Get token amount
     /// @param _weiAmount A positive number
     /// @return A positive number
     function _getTokenAmount(uint _weiAmount) internal view returns (uint) {
-        return _weiAmount.mul(getEffectiveRate());
+        uint tokenAmount = super._getTokenAmount(_weiAmount);
+
+        if (now <= ICONIQ_SALE_CLOSING_TIME) {
+            return tokenAmount.mul((100 + BONUS_PCT_IN_ICONIQ_SALE) / 100);
+        }
+
+        if (now <= VREO_SALE_PHASE_1_END_TIME) {
+            return tokenAmount.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_1) / 100);
+        }
+
+        if (now <= VREO_SALE_PHASE_2_END_TIME) {
+            return tokenAmount.mul((100 + BONUS_PCT_IN_VREO_SALE_PHASE_2) / 100);
+        }
+
+        return tokenAmount;  // No bonus
     }
 
     /// @dev Deliver tokens

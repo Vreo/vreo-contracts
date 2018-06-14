@@ -9,9 +9,9 @@ import "../zeppelin/crowdsale/Crowdsale.sol";
 contract PostKYCCrowdsale is Crowdsale, Ownable {
 
     struct Investment {
-        bool isVerified;  // wether or not the investor passed the KYC process
-        uint weiAmount;   // invested wei
-        uint tokenAmount; // amount of token quantums the investor wants to purchase
+        bool isVerified;         // wether or not the investor passed the KYC process
+        uint totalWeiInvested;   // invested wei
+        uint pendingTokenAmount; // amount of token quantums the investor wants to purchase
     }
 
     mapping(address => Investment) public investments;
@@ -42,35 +42,36 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
 
                 emit InvestorVerified(investor);
 
-                uint weiAmount = investment.weiAmount;
-                uint tokenAmount = investment.tokenAmount;
+                uint pendingTokenAmount = investment.pendingTokenAmount;
 
-                if (weiAmount > 0) {
-                    investment.weiAmount = 0;
-                    investment.tokenAmount = 0;
+                if (pendingTokenAmount > 0) {
+                    investment.pendingTokenAmount = 0;
 
-                    _forwardFunds(weiAmount);
-                    _deliverTokens(investor, tokenAmount);
+                    _forwardFunds(investment.totalWeiInvested);
+                    _deliverTokens(investor, pendingTokenAmount);
 
-                    emit TokensDelivered(investor, tokenAmount);
+                    emit TokensDelivered(investor, pendingTokenAmount);
                 }
             }
         }
     }
 
-    /// @dev Withdraw
-    function withdraw() public {
+    /// @dev Withdraw investment
+    function withdrawInvestment() public {
         Investment storage investment = investments[msg.sender];
-        uint weiAmount = investment.weiAmount;
 
-        require(weiAmount > 0);
+        require(!investment.isVerified);
 
-        investment.weiAmount = 0;
-        investment.tokenAmount = 0;
+        uint totalWeiInvested = investment.totalWeiInvested;
 
-        msg.sender.transfer(weiAmount);
+        require(totalWeiInvested > 0);
 
-        emit Withdrawn(msg.sender, weiAmount);
+        investment.totalWeiInvested = 0;
+        investment.pendingTokenAmount = 0;
+
+        msg.sender.transfer(totalWeiInvested);
+
+        emit Withdrawn(msg.sender, totalWeiInvested);
     }
 
     /// @dev Pre validate purchase
@@ -83,21 +84,25 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Process purchase
-    // @param _beneficiary An Ethereum address
+    /// @param _beneficiary An Ethereum address
     /// @param _tokenAmount A positive number
-    function _processPurchase(address, uint _tokenAmount) internal {
-        if (investments[msg.sender].isVerified) {
-            _deliverTokens(msg.sender, _tokenAmount);
+    function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
+        Investment storage investment = investments[msg.sender];
 
-            emit TokensDelivered(msg.sender, _tokenAmount);
+        if (investment.isVerified) {
+            _deliverTokens(_beneficiary, _tokenAmount);
+
+            emit TokensDelivered(_beneficiary, _tokenAmount);
         } else {
-            investments[msg.sender].weiAmount = msg.value;
-            investments[msg.sender].tokenAmount = _tokenAmount;
+            investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
+            investment.pendingTokenAmount = investment.pendingTokenAmount.add(_tokenAmount);
         }
     }
 
     /// @dev Forward funds
     function _forwardFunds() internal {
+        // Ensure the investor was verified, i.e. his purchased tokens were delivered,
+        // before forwarding funds.
         if (investments[msg.sender].isVerified) {
             super._forwardFunds();
         }
