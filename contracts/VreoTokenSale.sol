@@ -34,8 +34,6 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     uint public constant VREO_SALE_CLOSING_TIME     = 1534622400;  // 2018-08-18 22:00:00 CEST
     uint public constant KYC_VERIFICATION_END_TIME  = 1535832000;  // 2018-09-01 22:00:00 CEST
 
-    uint public constant MINIMUM_LIFETIME_AFTER_END = 365 days;
-
     // Max amount of wei ICONIQ investors can buy per ICONIQ TOKEN_SHARE_OF_TEAM
     uint public constant WEI_INVESTABLE_PER_ICONIQTOKEN = 1000;
 
@@ -96,14 +94,6 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         bountyAddress = _bountyAddress;
 
         remainingTokensForSale = TOTAL_TOKEN_CAP_OF_SALE;
-    }
-
-    /// @dev Destroy
-    function liquidate() public onlyOwner {
-        require(now >= KYC_VERIFICATION_END_TIME + MINIMUM_LIFETIME_AFTER_END);
-
-        owner.transfer(address(this).balance);
-        //selfdestruct(owner);
     }
 
     /// @dev Distribute presale

@@ -25,10 +25,10 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     /// @param amount A positive number
     event TokensDelivered(address investor, uint amount);
 
-    /// @dev Log entry on withdrawn
+    /// @dev Log entry on investment withdrawn
     /// @param investor An Ethereum address
     /// @param value A positive number
-    event Withdrawn(address investor, uint value);
+    event InvestmentWithdrawn(address investor, uint value);
 
     /// @dev Verify investors
     /// @param _investors An Ethereum address
@@ -71,7 +71,7 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
 
         msg.sender.transfer(totalWeiInvested);
 
-        emit Withdrawn(msg.sender, totalWeiInvested);
+        emit InvestmentWithdrawn(msg.sender, totalWeiInvested);
     }
 
     /// @dev Pre validate purchase
