@@ -62,8 +62,9 @@ Set Rate
 The token sale contract provides a function that enables the token
 contract owner to set the MERO Token price at any time. The
 price represents the MERO per ETH rate. With a target
-price of $0.05$ € per MERO we will have a rate of
-approximately 9,000$ according to a price of approximately € per ETH.
+price of 0.05 € per MERO we will have a rate of
+approximately 9,000 according to a price of approximately € per ETH.
+There is a sanity check, that allows to change the rate only by one order of magnitude up or down.
 
 
 Tokens are minted by the token sale contract.
@@ -85,17 +86,17 @@ The token sale consists of the two stages ICONIQ sale and VREO sale
 
 
 
-Presale
--------
+Private Presale
+---------------
 
-At any time before the end of the VREO sale, tokens can be issued issued 
-to private presale investors by the owner of the token sale contract. The token sale contract can process a list containing the amounts of tokens assigned to presale buyer addresses. 
+At any time before the end of the VREO sale, tokens can be issued  
+to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses. 
 
 ICONIQ sale
 -----------
 
-There will be a presale period exclusively accessible by ICONIQ-Token holders. The amount of ETH an address can send is dependent on the amount of ICONIQ token it holds sat the time of investment. 
-Investors 
+There will be a presale period exclusively accessible by ICONIQ-Token holders. The amount of ETH an address can send is dependent on the amount of ICONIQ token it holds at the time of investment. 
+To check the amount of ETH investors are allowed to invest, the ICONIQ token balance of the investor is multiplied with a constant "ICONIQ token needed per Wei" (in this context ICONIQ token means integral tokens quantums). One could also calculate ICONIQ/ETH, since ETH, MERO and ICONIQ have the same decimals. 
 
 VREO sale
 ---------
