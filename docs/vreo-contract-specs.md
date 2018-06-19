@@ -67,19 +67,22 @@ approximately 9,000 according to a price of approximately € per ETH.
 There is a sanity check, that allows to change the rate only by one order of magnitude up or down.
 
 
-Tokens are minted by the token sale contract.
+Token pools
+-----------
 
-  Pool                   Cap               distribution time
-  ---------- ----- ------------- ---------------------------------------
-  priv. Presale      no cap       any time before end of Vreo sale
-  ICONIQ sale	     no cap       between start and end date of ICONIQ sale
-  Vreo sale          no cap       between start and end date of Vreo sale
+  Pool                       Cap  distribution time
+  --------------- --------------  -----------------------------------------
+  private Presale         no cap  any time before end of Vreo sale
+  ICONIQ sale	          no cap  between start and end date of ICONIQ sale
+  Vreo sale               no cap  between start and end date of Vreo sale
   total sale         450,000,000  before end of VREO sale
-  Bounty              50,000,000             at finalization
-  Team                85,000,000             at finalization
-  Legals              57,000,000             at finalization
-  Advisors            58,000,000             at finalization
+  Bounty              50,000,000  at finalization
+  Team                85,000,000  at finalization
+  Legals              57,000,000  at finalization
+  Advisors            58,000,000  at finalization
   Token Cap          700,000,000 
+
+
 
 The token sale consists of the two stages ICONIQ sale and VREO sale
 
