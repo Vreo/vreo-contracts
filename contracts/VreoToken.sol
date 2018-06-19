@@ -17,6 +17,7 @@ contract VreoToken is CappedToken, PausableToken, BurnableToken {
 
     /// @dev Constructor
     constructor() public CappedToken(TOTAL_TOKEN_CAP) {
+        pause();
     }
 
 }
