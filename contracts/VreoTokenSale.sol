@@ -100,6 +100,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     /// @param _investors A list where each entry is an Ethereum address
     /// @param _amounts A list where each entry is a positive number
     function distributePresale(address[] _investors, uint[] _amounts) public onlyOwner {
+        require(!hasClosed());
         require(_investors.length == _amounts.length);
 
         uint totalAmount = 0;

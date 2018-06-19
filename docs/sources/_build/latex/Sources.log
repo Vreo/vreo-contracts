@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  14 JUN 2018 19:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  15 JUN 2018 13:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1053,11 +1053,11 @@ Chapter 2.
 [2
 
 ]
-Underfull \vbox (badness 10000) detected at line 232
+Underfull \vbox (badness 10000) detected at line 229
  []
 
 
-Overfull \vbox (3.29312pt too high) detected at line 232
+Overfull \vbox (3.29312pt too high) detected at line 229
  []
 
 [3] [4]
@@ -1098,7 +1098,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 489.
 Here is how much of TeX's memory you used:
  13333 strings out of 493093
  184090 string characters out of 6138119
- 558336 words of memory out of 5000000
+ 562792 words of memory out of 5000000
  16527 multiletter control sequences out of 15000+600000
  36921 words of font info for 53 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
@@ -1110,7 +1110,7 @@ onts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/share/texmf-dist
 pe1/public/amsfonts/cm/cmsy5.pfb></usr/local/share/texmf-dist/fonts/type1/urw/h
 elvetic/uhvb8a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8
 a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on Sources.pdf (11 pages, 77660 bytes).
+Output written on Sources.pdf (11 pages, 77955 bytes).
 PDF statistics:
  111 PDF objects out of 1000 (max. 8388607)
  86 compressed objects within 1 object stream
