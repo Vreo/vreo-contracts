@@ -1,19 +1,23 @@
 pragma solidity 0.4.24;
 
+import "../zeppelin/math/SafeMath.sol";
+
+
 contract IconiqTokenMock {
+    using SafeMath for uint;
 
-    mapping(address => uint) balances;
+    mapping(address => uint) public balanceOf;
+    uint public totalSupply;
+    uint public freeAmount;
 
-    constructor(address[] _investors, uint[] _amounts) public {
-        require(_investors.length == _amounts.length);
-
-        for (uint i = 0; i < _investors.length; ++i) {
-            balances[_investors[i]] = _amounts[i];
-        }
+    constructor(uint _totalSupply) public {
+        totalSupply = _totalSupply;
+        freeAmount = _totalSupply;
     }
 
-    function balanceOf(address _investor) public view returns (uint) {
-        return balances[_investor];
+    function setBalance(address _holder, uint _amount) public {
+        freeAmount = freeAmount.add(balanceOf[_holder]).sub(_amount);
+        balanceOf[_holder] = _amount;
     }
 
 }

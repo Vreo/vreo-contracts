@@ -10,17 +10,12 @@ const {rejectTx, rejectDeploy, log, logGas, currency,
        duration, now, sleep, increaseTimeTo, randomAddr} = require("./helpers/common");
 
 
-contract("VreoTokenSale", ([owner,
-                            investor1,
-                            investor2,
-                            investor3,
-                            largeIconiqHolder,
-                            smallIconiqHolder,
-                            tinyIconiqHolder,
-                            nonIconiqHolder,
-                            anyone]) => {
-    // Constants: token amounts
-    //                                        M  k  1
+contract("VreoTokenSale", (accounts) => {
+    const owner = accounts[0];
+    const anyone = accounts[1];
+    const buyers = accounts.slice(2);
+
+    // Constants: token amounts               M  k  1
     const TOTAL_TOKEN_CAP         = new BN("700000000e18");
     const TOTAL_TOKEN_CAP_OF_SALE = new BN("450000000e18");
     const TOKEN_SHARE_OF_TEAM     = new BN( "85000000e18");
@@ -43,7 +38,7 @@ contract("VreoTokenSale", ([owner,
     const VREO_SALE_CLOSING_TIME     = timestamp("2018-08-18 22:00:00 +2");
     const KYC_VERIFICATION_END_TIME  = timestamp("2018-09-01 22:00:00 +2");
 
-    // Constants: wei amounts
+    // Constants: iconiq sale constraint
     const ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500;
 
     // Helper function: default deployment parameters
@@ -69,15 +64,8 @@ contract("VreoTokenSale", ([owner,
         if (!("token" in params)) {
             params.token = (await VreoToken.new({from: owner})).address;
         }
-        if(!("iconiqToken" in params)) {
-            let totalAmount = new BN("20000000e18");
-            let tinyAmount = totalAmount.divToInt(1000);
-            let smallAmount = totalAmount.divToInt(3);
-            let largeAmount = totalAmount.minus(smallAmount).minus(tinyAmount);
-
-            params.iconiqToken = (await IconiqToken.new([largeIconiqHolder, smallIconiqHolder, tinyIconiqHolder],
-                                                        [largeAmount, smallAmount, tinyAmount],
-                                                        {from: owner})).address;
+        if (!("iconiqToken" in params)) {
+            params.iconiqToken = (await IconiqToken.new(new BN("20000000e18"), {from: owner})).address;
         }
 
         return VreoTokenSale.new(params.token,
@@ -90,6 +78,10 @@ contract("VreoTokenSale", ([owner,
                                  params.wallet,
                                  {from: owner});
     };
+
+    // Helper function: "cast" Investment structure
+    const Investment = ([isVerified, totalWeiInvested, pendingTokenAmount]) =>
+                       ({isVerified, totalWeiInvested, pendingTokenAmount});
 
     // Actual unit tests
 
@@ -278,6 +270,8 @@ contract("VreoTokenSale", ([owner,
 
     describe("private presale token distribution", () => {
         let token, sale;
+        let privateInvestor1 = randomAddr(),
+            privateInvestor2 = randomAddr();
 
         before("deploy", async () => {
             sale = await deployTokenSale();
@@ -287,14 +281,14 @@ contract("VreoTokenSale", ([owner,
 
         it("is forbidden for anyone but owner", async () => {
             let totalSupply = await token.totalSupply();
-            await rejectTx(sale.distributePresale([investor1, investor2], [10, 20], {from: anyone}));
+            await rejectTx(sale.distributePresale([privateInvestor1, privateInvestor2], [10, 20], {from: anyone}));
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
         });
 
         it("is forbidden if number of investors is not equal to number of amounts", async () => {
             let totalSupply = await token.totalSupply();
-            await rejectTx(sale.distributePresale([investor1], [10, 20], {from: owner}));
-            await rejectTx(sale.distributePresale([investor1, investor2], [10], {from: owner}));
+            await rejectTx(sale.distributePresale([privateInvestor1], [10, 20], {from: owner}));
+            await rejectTx(sale.distributePresale([privateInvestor1, privateInvestor2], [10], {from: owner}));
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
         });
 
@@ -303,23 +297,23 @@ contract("VreoTokenSale", ([owner,
         });
 
         it("increases token balance of private investors", async () => {
-            let balance = await token.balanceOf(investor1);
+            let balance = await token.balanceOf(privateInvestor1);
             let amount = new BN("2525e18");
-            await sale.distributePresale([investor1], [amount], {from: owner});
-            expect(await token.balanceOf(investor1)).to.be.bignumber.equal(balance.plus(amount));
+            await sale.distributePresale([privateInvestor1], [amount], {from: owner});
+            expect(await token.balanceOf(privateInvestor1)).to.be.bignumber.equal(balance.plus(amount));
         });
 
         it("increases total supply of tokens", async () => {
             let totalSupply = await token.totalSupply();
             let amount = new BN("3535e18");
-            await sale.distributePresale([investor1], [amount], {from: owner});
+            await sale.distributePresale([privateInvestor1], [amount], {from: owner});
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount));
         });
 
         it("decreases remaining tokens for sale", async () => {
             let remaining = await sale.remainingTokensForSale();
             let amount = new BN("4545e18");
-            await sale.distributePresale([investor1], [amount], {from: owner});
+            await sale.distributePresale([privateInvestor1], [amount], {from: owner});
             expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
         });
 
@@ -357,36 +351,185 @@ contract("VreoTokenSale", ([owner,
         it("is forbidden if amount exceeds cap", async () => {
             let totalSupply = await token.totalSupply();
             let remaining = await sale.remainingTokensForSale();
-            await rejectTx(sale.distributePresale([investor1], [remaining.plus(1)], {from: owner}));
+            await rejectTx(sale.distributePresale([privateInvestor1], [remaining.plus(1)], {from: owner}));
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
         });
 
         it("is forbidden if amount exceeds cap even if tokens were burnt", async () => {
             let totalSupply = await token.totalSupply();
             let amount = new BN("5555e18");
-            await sale.distributePresale([investor2], [amount], {from: owner});
+            await sale.distributePresale([anyone], [amount], {from: owner});
             let remaining = await sale.remainingTokensForSale();
-            await token.burn(amount, {from: investor2});
-            await rejectTx(sale.distributePresale([investor1], [remaining.plus(1)], {from: owner}));
+            await token.burn(amount, {from: anyone});
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
+            await rejectTx(sale.distributePresale([privateInvestor1], [remaining.plus(1)], {from: owner}));
         });
 
         it("is possible if amount reaches cap", async () => {
-            let balance = await token.balanceOf(investor1);
+            let balance = await token.balanceOf(privateInvestor1);
             let remaining = await sale.remainingTokensForSale();
-            await sale.distributePresale([investor1], [remaining], {from: owner});
-            expect(await token.balanceOf(investor1)).to.be.bignumber.equal(balance.plus(remaining));
+            await sale.distributePresale([privateInvestor1], [remaining], {from: owner});
+            expect(await token.balanceOf(privateInvestor1)).to.be.bignumber.equal(balance.plus(remaining));
             expect(await sale.remainingTokensForSale()).to.be.bignumber.zero;
         });
 
         it("is forbidden if tokens were sold out", async () => {
             let totalSupply = await token.totalSupply();
-            await rejectTx(sale.distributePresale([investor1], [1], {from: owner}));
+            await rejectTx(sale.distributePresale([privateInvestor1], [1], {from: owner}));
             expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
         });
     });
 
-    describe("before iconic sale", () => {
+    describe("investor verification", () => {
+        let sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            await (await VreoToken.at(await sale.token())).transferOwnership(sale.address, {from: owner});
+        });
+
+        it("is forbidden for anyone but owner", async () => {
+            let investor = randomAddr();
+            await rejectTx(sale.verifyInvestors([investor], {from: anyone}));
+            expect(Investment(await sale.investments(investor)).isVerified).to.be.false;
+        });
+
+        it("is possible", async () => {
+            let investor = randomAddr();
+            let tx = await sale.verifyInvestors([investor], {from: owner});
+            let log = tx.logs.find(log => log.event === "InvestorVerified");
+            expect(log).to.exist;
+            expect(log.args.investor).to.be.bignumber.equal(investor);
+            expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
+        });
+
+        it("is possible for many (i.e. > 2) investors at once", async () => {
+            await logGas(sale.verifyInvestors([], {from: owner}), "no investors");
+            let nSucc = 0;
+            let nFail = -1;
+            let nTest = 1;
+            while (nTest != nSucc) {
+                let investors = [];
+                for (let i = 0; i < nTest; ++i) {
+                    investors.push(randomAddr());
+                }
+                let success = true;
+                try {
+                    await logGas(sale.verifyInvestors(investors, {from: owner}), nTest + " investors");
+                }
+                catch (error) {
+                    success = false;
+                }
+                if (success) {
+                    nSucc = nTest;
+                    nTest = nFail < 0 ? 2 * nTest : Math.trunc((nTest + nFail) / 2);
+                }
+                else {
+                    nFail = nTest;
+                    nTest = Math.trunc((nSucc + nTest) / 2);
+                }
+            }
+            expect(nSucc).to.be.at.above(2);
+        });
+    });
+
+    describe("before sales", () => {
+        let iconiq, token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            iconiq = await IconiqToken.at(await sale.iconiqToken());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
+
+        afterEach("invariant: token supply is below sale cap", async () => {
+            expect(await token.totalSupply()).to.be.bignumber.most(TOTAL_TOKEN_CAP_OF_SALE);
+        });
+
+        it("iconiq sale is not ongoing", async () => {
+            expect(await sale.iconiqSaleOngoing()).to.be.false;
+        });
+
+        it("vreo sale is not ongoing", async () => {
+            expect(await sale.vreoSaleOngoing()).to.be.false;
+        });
+
+        it("sale is not closed", async () => {
+            expect(await sale.hasClosed()).to.be.false;
+        });
+
+        it("is possible to distribute presold tokens", async () => {
+            await sale.distributePresale([randomAddr()], [new BN("1000e18")], {from: owner});
+        });
+
+        it("is forbidden to buy tokens", async () => {
+            let investor = buyers[0];
+            await iconiq.setBalance(investor, await iconiq.totalSupply());
+            await rejectTx(sale.buyTokens(investor, {from: investor, value: 1}));
+        });
+
+        it("is possible to verify investors", async () => {
+            let investor = randomAddr();
+            await sale.verifyInvestors([investor], {from: owner});
+            expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
+        });
+    });
+
+    describe("during iconiq sale", () => {
+        let iconiq, token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            iconiq = await IconiqToken.at(await sale.iconiqToken());
+            await token.transferOwnership(sale.address, {from: owner});
+            await increaseTimeTo(ICONIQ_SALE_OPENING_TIME);
+        });
+
+        afterEach("invariant: token supply is below sale cap", async () => {
+            expect(await token.totalSupply()).to.be.bignumber.most(TOTAL_TOKEN_CAP_OF_SALE);
+        });
+
+        it("iconiq sale is ongoing", async () => {
+            expect(await sale.iconiqSaleOngoing()).to.be.true;
+        });
+
+        it("vreo sale is not ongoing", async () => {
+            expect(await sale.vreoSaleOngoing()).to.be.false;
+        });
+
+        it("sale is not closed", async () => {
+            expect(await sale.hasClosed()).to.be.false;
+        });
+
+        it("non iconiq holder cannot invest", async () => {
+            let investor = buyers[0];
+            await iconiq.setBalance(investor, 0);
+            expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.zero;
+        });
+
+        it("iconiq holders with too small balance cannot invest", async () => {
+            let investor = buyers[0];
+            await iconiq.setBalance(investor, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI - 1);
+            expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.zero;
+        });
+
+        it("iconiq holders with the minimum balance can max invest 1 wei", async () => {
+            let investor = buyers[0];
+            await iconiq.setBalance(investor, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
+            expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.equal(1);
+        });
+
+        it("iconiq holder can max invest appropriate amount", async () => {
+            let investor = buyers[0];
+            let maxInvestment = currency.ether(42);
+            await iconiq.setBalance(investor, maxInvestment.times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
+            expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.equal(maxInvestment);
+        });
+    });
+
+    describe("between iconiq and vreo sale", () => {
         let token, sale;
 
         before("deploy", async () => {
@@ -394,34 +537,66 @@ contract("VreoTokenSale", ([owner,
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
         });
-
-        it("is possible to distribute presold tokens to private investors", async () => {
-            await sale.distributePresale([anyone], [new BN("1000e18")], {from: owner});
-        });
-    });
-
-    describe("during iconiq sale", () => {
-    });
-
-    describe("between iconiq and vreo sale", () => {
     });
 
     describe("during phase 1 of vreo sale", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
     describe("during phase 2 of vreo sale", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
     describe("during phase 3 of vreo sale", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
-    describe("after vreo sale until KYC verification end", () => {
+    describe("after sales until KYC verification end", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
     describe("between KYC verification end and finalization", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
     describe("after finalization", () => {
+        let token, sale;
+
+        before("deploy", async () => {
+            sale = await deployTokenSale();
+            token = await VreoToken.at(await sale.token());
+            await token.transferOwnership(sale.address, {from: owner});
+        });
     });
 
 });
