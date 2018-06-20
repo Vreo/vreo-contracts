@@ -1091,6 +1091,40 @@ contract("VreoTokenSale", ([owner, investor, anyone]) => {
                 expect(await token.mintingFinished()).to.be.true;
             });
         });
+
+        describe("finalization state", () => {
+
+            it("is finalized", async () => {
+                expect(await sale.isFinalized()).to.be.true;
+            });
+
+            it("cannot be finalized again", async () => {
+                await reject.tx(sale.finalize({from: owner}));
+            });
+        });
+
+        describe("token share distribution", () => {
+
+            it("team got its share", async () => {
+                let balance = await token.balanceOf(await sale.teamAddress());
+                expect(balance).to.be.bignumber.equal(TOKEN_SHARE_OF_TEAM);
+            });
+
+            it("advisors got its share", async () => {
+                let balance = await token.balanceOf(await sale.advisorsAddress());
+                expect(balance).to.be.bignumber.equal(TOKEN_SHARE_OF_ADVISORS);
+            });
+
+            it("legals got their share", async () => {
+                let balance = await token.balanceOf(await sale.legalsAddress());
+                expect(balance).to.be.bignumber.equal(TOKEN_SHARE_OF_LEGALS);
+            });
+
+            it("bounty got its share", async () => {
+                let balance = await token.balanceOf(await sale.bountyAddress());
+                expect(balance).to.be.bignumber.equal(TOKEN_SHARE_OF_BOUNTY);
+            });
+        });
     });
 
 });
