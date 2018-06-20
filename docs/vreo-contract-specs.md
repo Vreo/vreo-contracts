@@ -120,7 +120,8 @@ Project Timeline
 ================
 
 
-  |Date                  | Event                                             | |----------------------|---------------------------------------------------|
+  |Date                  | Event                                             |
+  |----------------------|---------------------------------------------------|
   |           2018-06-30 | Token contract deployment                         |
   |                      | Bounty contract deployment                        |
   |                      | Token sale contract deployment                    |
