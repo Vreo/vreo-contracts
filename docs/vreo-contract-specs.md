@@ -2,7 +2,7 @@ Token Contract
 ===========
 
 The token contract implements a ERC20 standard token. It is named MERO Token.
-Ticker symbol will be MERO. 
+Ticker symbol will be MERO.
 The number of decimals will be 18 to keep the MERO resolution identical to ETH.
 
 The token contract emits the standard ERC20 events including a transfer
@@ -45,15 +45,15 @@ Token Sale Contract
 Post KYC crowd sale
 -------------------
 
-The token sale contract implements a new scheme for KYC verification. Everybody is able to invest ETH into the crowd sale but tokens are only minted after the KYC of the sending address is verified. 
-If an unverified investor sends ETH, tokens are not minted but the amount of pending tokens will be stored and issued when the address is verified by the owner of the token sale contract. 
+The token sale contract implements a new scheme for KYC verification. Everybody is able to invest ETH into the crowd sale but tokens are only minted after the KYC of the sending address is verified.
+If an unverified investor sends ETH, tokens are not minted but the amount of pending tokens will be stored and issued when the address is verified by the owner of the token sale contract.
 The verification should process multiple addresses in one transaction.
-Once an address is verified it can invest and the token purchase will be processed instantly. Investors who send ETH and do not provide KYC information or investors that do not meet KYC requirements, can withdraw their investment after the end of the token sale. 
+Once an address is verified it can invest and the token purchase will be processed instantly. Investors who send ETH and do not provide KYC information or investors that do not meet KYC requirements, can withdraw their investment after the end of the token sale.
 
 Bounty contract
 ---------------
 
-The Bounty tokens will be minted to the bounty contract during finalization. The owner the bounty contract can distribute tokens. The bounty contract works like an airdrop. The owner send a list of addresses and amounts to the bounty contract, which transfers the tokens to each bounty recipient.
+The Bounty tokens will be minted to the bounty contract during finalization. The owner the bounty contract can distribute tokens to bounty recipients. The bounty contract works like an airdrop. The owner sends a list of addresses and amounts to the bounty contract, which transfers the tokens to each bounty recipients.
 
 
 Set Rate
@@ -70,17 +70,17 @@ There is a sanity check, that allows to change the rate only by one order of mag
 Token pools
 -----------
 
-  Pool                       Cap  distribution time
-  --------------- --------------  -----------------------------------------
-  private Presale         no cap  any time before end of Vreo sale
-  ICONIQ sale	          no cap  between start and end date of ICONIQ sale
-  Vreo sale               no cap  between start and end date of Vreo sale
-  total sale         450,000,000  before end of VREO sale
-  Bounty              50,000,000  at finalization
-  Team                85,000,000  at finalization
-  Legals              57,000,000  at finalization
-  Advisors            58,000,000  at finalization
-  Token Cap          700,000,000 
+  |Pool           | |          Cap|  |distribution time                        |
+  |---------------| |-------------|  |-----------------------------------------|
+  |private Presale| |       no cap|  |any time before end of Vreo sale         |
+  |ICONIQ sale	  | |       no cap|  |between start and end date of ICONIQ sale|
+  |Vreo sale      | |       no cap|  |between start and end date of Vreo sale  |
+  |total sale     | |  450,000,000|  |before end of VREO sale                  |
+  |Bounty         | |   50,000,000|  |at finalization                          |
+  |Team           | |   85,000,000|  |at finalization                          |
+  |Legals         | |   57,000,000|  |at finalization                          |
+  |Advisors       | |   58,000,000|  |at finalization                          |
+  |Token Cap      | |  700,000,000|  |                                         |
 
 
 
@@ -93,13 +93,13 @@ Private Presale
 ---------------
 
 At any time before the end of the VREO sale, tokens can be issued  
-to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses. 
+to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses.
 
 ICONIQ sale
 -----------
 
-There will be a presale period exclusively accessible by ICONIQ-Token holders. The amount of ETH an address can send is dependent on the amount of ICONIQ token it holds at the time of investment. 
-To check the amount of ETH investors are allowed to invest, the ICONIQ token balance of the investor is multiplied with a constant "ICONIQ token needed per Wei" (in this context ICONIQ token means integral tokens quantums). One could also calculate ICONIQ/ETH, since ETH, MERO and ICONIQ have the same decimals. 
+There will be a presale period exclusively accessible by ICONIQ-Token holders. The amount of ETH an address can send is dependent on the amount of ICONIQ token it holds at the time of investment.
+To check the amount of ETH investors are allowed to invest, the ICONIQ token balance of the investor is multiplied with a constant "ICONIQ token needed per Wei" (in this context ICONIQ token means integral tokens quantums). One could also calculate ICONIQ/ETH, since ETH, MERO and ICONIQ have the same decimals.
 
 VREO sale
 ---------
@@ -120,29 +120,28 @@ Project Timeline
 ================
 
 
-
-                    Date Event
-  ---------------------- --------------------------------------------------------------
-              2018-06-30 Token contract deployment
-                         Bounty contract deployment
-                         Token sale contract deployment
-                         Transfer of token contract ownership to token sale contract
-                         Etherscan code verification
-                         Transfer of ownership of token sale contract to VREO
-              2018-07-01 Start of ICONIQ sale
-              2018-08-18 End of VREO sale
-              2018-09-01 End of KYC period, Finalization possible
+  |Date                 | |Event                                             |
+  |---------------------| |--------------------------------------------------|
+  |           2018-06-30| |Token contract deployment                         |
+  |                     | |Bounty contract deployment                        |
+  |                     | |Token sale contract deployment                    |
+  |                     | |Transfer of token ownership to token sale contract|
+  |                     | |Etherscan code verification                       |
+  |           2018-07-01| |Start of ICONIQ sale                              |
+  |           2018-08-18| |End of VREO sale                                  |
+  |           2018-09-01| |End of KYC period, Finalization possible          |
 
 
-    Event                       Date
-    ------------------------    ------------------------
-    ICONIQ sale opening time    2018-07-01 10:00:00 CEST
-    ICONIQ sale closing time    2018-07-14 22:00:00 CEST
-    VREO sale opening time      2018-07-21 10:00:00 CEST
-    VREO end of phase one       2018-07-24 22:00:00 CEST
-    VREO end of phase two       2018-08-01 22:00:00 CEST
-    VREO sale closing time      2018-08-18 22:00:00 CEST
-    end of KYC verification     2018-09-01 22:00:00 CEST
+  |Date                    | |Event                                       |
+  |------------------------| |--------------------------------------------|
+  |2018-07-01 10:00:00 CEST| |ICONIQ sale opening time                    |
+  |2018-07-14 22:00:00 CEST| |ICONIQ sale closing time                    |
+  |2018-07-21 10:00:00 CEST| |VREO sale opening time                      |
+  |2018-07-24 22:00:00 CEST| |VREO end of phase one                       |
+  |2018-08-01 22:00:00 CEST| |VREO end of phase two                       |
+  |2018-08-18 22:00:00 CEST| |VREO sale closing time                      |
+  |2018-09-01 22:00:00 CEST| |end of KYC verification                     |
+
 
 Deployment Requirements
 =======================
@@ -150,19 +149,13 @@ Deployment Requirements
 The following requirements have to be fulfilled at deployment time
 2018-06-30:
 
-                          Requirement Source         Value
-  ----------------------------------- -------------- --------------------------------------------
-              address of ICONIQ token ICONIQ         0xB3e2Cb7CccfE139f8FF84013823Bf22dA6B6390A     
-          ICONIQ token needed per Wei ICONIQ
-    Initial token sale contract owner VREO
-                      Main ICO wallet VREO           
-                      Advisors wallet VREO
-                          Team wallet VREO    
-                        Legals wallet VREO
-     Ethereum address of bounty owner VREO
-                 
-                                    
-
-
-
-         
+|Requirement                | |Source         Value
+|---------------------------| |------| |------------------------------------------|
+|address of ICONIQ token    | |ICONIQ| |0xB3e2Cb7CccfE139f8FF84013823Bf22dA6B6390A|   
+|ICONIQ token needed per Wei| |ICONIQ| |                                          |
+|Token sale contract owner  | |VREO  | |                                          |
+|Main ICO wallet            | |VREO  | |                                          |
+|Advisors wallet            | |VREO  | |                                          |
+|Team wallet                | |VREO  | |                                          |
+|Legals wallet              | |VREO  | |                                          |
+|Address of bounty owner    | |VREO  | |                                          |
