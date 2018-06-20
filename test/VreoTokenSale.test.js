@@ -9,10 +9,7 @@ const {expect} = require("chai").use(require("chai-bignumber")(BN));
 const {random, time, money, reject, snapshot, logGas} = require("./helpers/common");
 
 
-contract("VreoTokenSale", accounts => {
-    const owner = accounts.shift();
-    const anyone = accounts.shift();
-
+contract("VreoTokenSale", ([owner, investor, anyone]) => {
     // Constants: token amounts               M  k  1
     const TOTAL_TOKEN_CAP         = new BN("700000000e18");
     const TOTAL_TOKEN_CAP_OF_SALE = new BN("450000000e18");
@@ -46,7 +43,7 @@ contract("VreoTokenSale", accounts => {
                 legalsAddress: random.address(),
                 bountyAddress: random.address(),
                 wallet: random.address()};
-    };reject.tx
+    };
 
     // Helper function: deploy VreoTokenSale contract (and a VreoToken if not given)
     // Missing parameters will be set to default values
@@ -105,11 +102,11 @@ contract("VreoTokenSale", accounts => {
     let initialState;
 
     before("save initial state", async () => {
-        initialState = await snapshot.create();
+        initialState = await snapshot.new();
     });
 
-    after("revert to initial state", async () => {
-        await snapshot.revert(initialState);
+    after("revert initial state", async () => {
+        await initialState.revert();
     });
 
     describe("deployment", () => {
@@ -121,7 +118,7 @@ contract("VreoTokenSale", accounts => {
             });
 
             it("fails if token is not properly capped", async () => {
-                await reject.deploy(deployTokenSale({token: 0xDEADBEEF}));
+                await reject.deploy(deployTokenSale({token: random.address()}));
             });
 
             it("fails if rate is zero", async () => {
@@ -235,219 +232,219 @@ contract("VreoTokenSale", accounts => {
         });
     });
 
-    describe("rate change", () => {
-        let sale;
+    describe("general functionality", () => {
 
-        before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
-            sale = await deployTokenSale();
+        describe("rate change", () => {
+            let sale;
+
+            before("deploy", async () => {
+                await initialState.restore();
+                sale = await deployTokenSale();
+            });
+
+            it("is forbidden for anyone but owner", async () => {
+                let rate = await sale.rate();
+                await reject.tx(sale.setRate(rate.plus(1), {from: anyone}));
+                expect(await sale.rate()).to.be.bignumber.equal(rate);
+            });
+
+            it("is forbidden if new rate is zero", async () => {
+                let rate = await sale.rate();
+                await reject.tx(sale.setRate(0, {from: owner}));
+                expect(await sale.rate()).to.be.bignumber.equal(rate);
+            });
+
+            it("is forbidden if new rate is equal or below a tenth of current", async () => {
+                let rate = await sale.rate();
+                await reject.tx(sale.setRate(rate.divToInt(10), {from: owner}));
+                expect(await sale.rate()).to.be.bignumber.equal(rate);
+            });
+
+            it("is forbidden if new rate is equal or above ten times of current", async () => {
+                let rate = await sale.rate();
+                await reject.tx(sale.setRate(rate.times(10), {from: owner}));
+                expect(await sale.rate()).to.be.bignumber.equal(rate);
+            });
+
+            it("is possible", async () => {
+                let newRate = (await sale.rate()).times(2);
+                let tx = await sale.setRate(newRate, {from: owner});
+                let entry = tx.logs.find(entry => entry.event === "RateChanged");
+                expect(entry).to.exist;
+                expect(entry.args.newRate).to.be.bignumber.equal(newRate);
+                expect(await sale.rate()).to.be.bignumber.equal(newRate);
+            });
         });
 
-        it("is forbidden for anyone but owner", async () => {
-            let rate = await sale.rate();
-            await reject.tx(sale.setRate(rate.plus(1), {from: anyone}));
-            expect(await sale.rate()).to.be.bignumber.equal(rate);
-        });
+        describe("private presale token distribution", () => {
+            let token, sale;
 
-        it("is forbidden if new rate is zero", async () => {
-            let rate = await sale.rate();
-            await reject.tx(sale.setRate(0, {from: owner}));
-            expect(await sale.rate()).to.be.bignumber.equal(rate);
-        });
+            before("deploy", async () => {
+                await initialState.restore();
+                sale = await deployTokenSale();
+                token = await VreoToken.at(await sale.token());
+                await token.transferOwnership(sale.address, {from: owner});
+            });
 
-        it("is forbidden if new rate is equal or below a tenth of current", async () => {
-            let rate = await sale.rate();
-            await reject.tx(sale.setRate(rate.divToInt(10), {from: owner}));
-            expect(await sale.rate()).to.be.bignumber.equal(rate);
-        });
+            it("is forbidden for anyone but owner", async () => {
+                let privateInvestor1 = random.address(),
+                    privateInvestor2 = random.address();
+                let totalSupply = await token.totalSupply();
+                await reject.tx(sale.distributePresale([privateInvestor1, privateInvestor2], [10, 20], {from: anyone}));
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
+            });
 
-        it("is forbidden if new rate is equal or above ten times of current", async () => {
-            let rate = await sale.rate();
-            await reject.tx(sale.setRate(rate.times(10), {from: owner}));
-            expect(await sale.rate()).to.be.bignumber.equal(rate);
-        });
+            it("is forbidden if number of investors is not equal to number of amounts", async () => {
+                let privateInvestor1 = random.address(),
+                    privateInvestor2 = random.address();
+                let totalSupply = await token.totalSupply();
+                await reject.tx(sale.distributePresale([privateInvestor1], [10, 20], {from: owner}));
+                await reject.tx(sale.distributePresale([privateInvestor1, privateInvestor2], [10], {from: owner}));
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
+            });
 
-        it("is possible", async () => {
-            let newRate = (await sale.rate()).times(2);
-            let tx = await sale.setRate(newRate, {from: owner});
-            let entry = tx.logs.find(entry => entry.event === "RateChanged");
-            expect(entry).to.exist;
-            expect(entry.args.newRate).to.be.bignumber.equal(newRate);
-            expect(await sale.rate()).to.be.bignumber.equal(newRate);
-        });
-    });
+            it("is possible", async () => {
+                await sale.distributePresale([], [], {from: owner});
+            });
 
-    describe("private presale token distribution", () => {
-        let token, sale;
+            it("increases token balance of private investors", async () => {
+                let privateInvestor = random.address();
+                let balance = await token.balanceOf(privateInvestor);
+                let amount = new BN("2525e18");
+                await sale.distributePresale([privateInvestor], [amount], {from: owner});
+                expect(await token.balanceOf(privateInvestor)).to.be.bignumber.equal(balance.plus(amount));
+            });
 
-        before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
-            sale = await deployTokenSale();
-            token = await VreoToken.at(await sale.token());
-            await token.transferOwnership(sale.address, {from: owner});
-        });
+            it("increases total supply of tokens", async () => {
+                let totalSupply = await token.totalSupply();
+                let amount = new BN("3535e18");
+                await sale.distributePresale([random.address()], [amount], {from: owner});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount));
+            });
 
-        it("is forbidden for anyone but owner", async () => {
-            let privateInvestor1 = random.address(),
-                privateInvestor2 = random.address();
-            let totalSupply = await token.totalSupply();
-            await reject.tx(sale.distributePresale([privateInvestor1, privateInvestor2], [10, 20], {from: anyone}));
-            expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
-        });
+            it("decreases remaining tokens for sale", async () => {
+                let remaining = await sale.remainingTokensForSale();
+                let amount = new BN("4545e18");
+                await sale.distributePresale([random.address()], [amount], {from: owner});
+                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
+            });
 
-        it("is forbidden if number of investors is not equal to number of amounts", async () => {
-            let privateInvestor1 = random.address(),
-                privateInvestor2 = random.address();
-            let totalSupply = await token.totalSupply();
-            await reject.tx(sale.distributePresale([privateInvestor1], [10, 20], {from: owner}));
-            await reject.tx(sale.distributePresale([privateInvestor1, privateInvestor2], [10], {from: owner}));
-            expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
-        });
-
-        it("is possible", async () => {
-            await sale.distributePresale([], [], {from: owner});
-        });
-
-        it("increases token balance of private investors", async () => {
-            let privateInvestor = random.address();
-            let balance = await token.balanceOf(privateInvestor);
-            let amount = new BN("2525e18");
-            await sale.distributePresale([privateInvestor], [amount], {from: owner});
-            expect(await token.balanceOf(privateInvestor)).to.be.bignumber.equal(balance.plus(amount));
-        });
-
-        it("increases total supply of tokens", async () => {
-            let totalSupply = await token.totalSupply();
-            let amount = new BN("3535e18");
-            await sale.distributePresale([random.address()], [amount], {from: owner});
-            expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount));
-        });
-
-        it("decreases remaining tokens for sale", async () => {
-            let remaining = await sale.remainingTokensForSale();
-            let amount = new BN("4545e18");
-            await sale.distributePresale([random.address()], [amount], {from: owner});
-            expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
-        });
-
-        it("is possible for many (i.e. > 2) investors at once", async () => {
-            await logGas(sale.distributePresale([], [], {from: owner}), "no investors");
-            let nSucc = 0;
-            let nFail = -1;
-            let nTest = 1;
-            while (nTest != nSucc) {
-                let investors = [];
-                let amounts = [];
-                for (let i = 0; i < nTest; ++i) {
-                    investors.push(random.address());
-                    amounts.push(i);
+            it("is possible for many (i.e. > 2) investors at once", async () => {
+                await logGas(sale.distributePresale([], [], {from: owner}), "no investors");
+                let nSucc = 0;
+                let nFail = -1;
+                let nTest = 1;
+                while (nTest != nSucc) {
+                    let investors = [];
+                    let amounts = [];
+                    for (let i = 0; i < nTest; ++i) {
+                        investors.push(random.address());
+                        amounts.push(i);
+                    }
+                    let success = true;
+                    try {
+                        await logGas(sale.distributePresale(investors, amounts, {from: owner}), nTest + " investors");
+                    }
+                    catch (error) {
+                        success = false;
+                    }
+                    if (success) {
+                        nSucc = nTest;
+                        nTest = nFail < 0 ? 2 * nTest : Math.trunc((nTest + nFail) / 2);
+                    }
+                    else {
+                        nFail = nTest;
+                        nTest = Math.trunc((nSucc + nTest) / 2);
+                    }
                 }
-                let success = true;
-                try {
-                    await logGas(sale.distributePresale(investors, amounts, {from: owner}), nTest + " investors");
-                }
-                catch (error) {
-                    success = false;
-                }
-                if (success) {
-                    nSucc = nTest;
-                    nTest = nFail < 0 ? 2 * nTest : Math.trunc((nTest + nFail) / 2);
-                }
-                else {
-                    nFail = nTest;
-                    nTest = Math.trunc((nSucc + nTest) / 2);
-                }
-            }
-            expect(nSucc).to.be.at.above(2);
+                expect(nSucc).to.be.at.above(2);
+            });
+
+            it("is forbidden if amount exceeds cap", async () => {
+                let totalSupply = await token.totalSupply();
+                let remaining = await sale.remainingTokensForSale();
+                await reject.tx(sale.distributePresale([random.address()], [remaining.plus(1)], {from: owner}));
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
+            });
+
+            it("is forbidden if amount exceeds cap even if tokens were burnt", async () => {
+                let totalSupply = await token.totalSupply();
+                let amount = new BN("5555e18");
+                await sale.distributePresale([anyone], [amount], {from: owner});
+                let remaining = await sale.remainingTokensForSale();
+                await token.burn(amount, {from: anyone});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
+                await reject.tx(sale.distributePresale([random.address()], [remaining.plus(1)], {from: owner}));
+            });
+
+            it("is possible if amount reaches cap", async () => {
+                let privateInvestor = random.address();
+                let balance = await token.balanceOf(privateInvestor);
+                let remaining = await sale.remainingTokensForSale();
+                await sale.distributePresale([privateInvestor], [remaining], {from: owner});
+                expect(await token.balanceOf(privateInvestor)).to.be.bignumber.equal(balance.plus(remaining));
+                expect(await sale.remainingTokensForSale()).to.be.bignumber.zero;
+            });
+
+            it("is forbidden if tokens were sold out", async () => {
+                let remaining = await sale.remainingTokensForSale();
+                await sale.distributePresale([random.address()], [remaining], {from: owner});
+                await reject.tx(sale.distributePresale([random.address()], [1], {from: owner}));
+            });
         });
 
-        it("is forbidden if amount exceeds cap", async () => {
-            let totalSupply = await token.totalSupply();
-            let remaining = await sale.remainingTokensForSale();
-            await reject.tx(sale.distributePresale([random.address()], [remaining.plus(1)], {from: owner}));
-            expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
-        });
+        describe("investor verification", () => {
+            let sale;
 
-        it("is forbidden if amount exceeds cap even if tokens were burnt", async () => {
-            let totalSupply = await token.totalSupply();
-            let amount = new BN("5555e18");
-            await sale.distributePresale([anyone], [amount], {from: owner});
-            let remaining = await sale.remainingTokensForSale();
-            await token.burn(amount, {from: anyone});
-            expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
-            await reject.tx(sale.distributePresale([random.address()], [remaining.plus(1)], {from: owner}));
-        });
+            before("deploy", async () => {
+                await initialState.restore();
+                sale = await deployTokenSale();
+                await (await VreoToken.at(await sale.token())).transferOwnership(sale.address, {from: owner});
+            });
 
-        it("is possible if amount reaches cap", async () => {
-            let privateInvestor = random.address();
-            let balance = await token.balanceOf(privateInvestor);
-            let remaining = await sale.remainingTokensForSale();
-            await sale.distributePresale([privateInvestor], [remaining], {from: owner});
-            expect(await token.balanceOf(privateInvestor)).to.be.bignumber.equal(balance.plus(remaining));
-            expect(await sale.remainingTokensForSale()).to.be.bignumber.zero;
-        });
+            it("is forbidden for anyone but owner", async () => {
+                let investor = random.address();
+                await reject.tx(sale.verifyInvestors([investor], {from: anyone}));
+                expect(Investment(await sale.investments(investor)).isVerified).to.be.false;
+            });
 
-        it("is forbidden if tokens were sold out", async () => {
-            let remaining = await sale.remainingTokensForSale();
-            await sale.distributePresale([random.address()], [remaining], {from: owner});
-            await reject.tx(sale.distributePresale([random.address()], [1], {from: owner}));
-        });
-    });
+            it("is possible", async () => {
+                let investor = random.address();
+                let tx = await sale.verifyInvestors([investor], {from: owner});
+                let entry = tx.logs.find(entry => entry.event === "InvestorVerified");
+                expect(entry).to.exist;
+                expect(entry.args.investor).to.be.bignumber.equal(investor);
+                expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
+            });
 
-    describe("investor verification", () => {
-        let sale;
-
-        before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
-            sale = await deployTokenSale();
-            await (await VreoToken.at(await sale.token())).transferOwnership(sale.address, {from: owner});
-        });
-
-        it("is forbidden for anyone but owner", async () => {
-            let investor = random.address();
-            await reject.tx(sale.verifyInvestors([investor], {from: anyone}));
-            expect(Investment(await sale.investments(investor)).isVerified).to.be.false;
-        });
-
-        it("is possible", async () => {
-            let investor = random.address();
-            let tx = await sale.verifyInvestors([investor], {from: owner});
-            let entry = tx.logs.find(entry => entry.event === "InvestorVerified");
-            expect(entry).to.exist;
-            expect(entry.args.investor).to.be.bignumber.equal(investor);
-            expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
-        });
-
-        it("is possible for many (i.e. > 2) investors at once", async () => {
-            await logGas(sale.verifyInvestors([], {from: owner}), "no investors");
-            let nSucc = 0;
-            let nFail = -1;
-            let nTest = 1;
-            while (nTest != nSucc) {
-                let investors = [];
-                for (let i = 0; i < nTest; ++i) {
-                    investors.push(random.address());
+            it("is possible for many (i.e. > 2) investors at once", async () => {
+                await logGas(sale.verifyInvestors([], {from: owner}), "no investors");
+                let nSucc = 0;
+                let nFail = -1;
+                let nTest = 1;
+                while (nTest != nSucc) {
+                    let investors = [];
+                    for (let i = 0; i < nTest; ++i) {
+                        investors.push(random.address());
+                    }
+                    let success = true;
+                    try {
+                        await logGas(sale.verifyInvestors(investors, {from: owner}), nTest + " investors");
+                    }
+                    catch (error) {
+                        success = false;
+                    }
+                    if (success) {
+                        nSucc = nTest;
+                        nTest = nFail < 0 ? 2 * nTest : Math.trunc((nTest + nFail) / 2);
+                    }
+                    else {
+                        nFail = nTest;
+                        nTest = Math.trunc((nSucc + nTest) / 2);
+                    }
                 }
-                let success = true;
-                try {
-                    await logGas(sale.verifyInvestors(investors, {from: owner}), nTest + " investors");
-                }
-                catch (error) {
-                    success = false;
-                }
-                if (success) {
-                    nSucc = nTest;
-                    nTest = nFail < 0 ? 2 * nTest : Math.trunc((nTest + nFail) / 2);
-                }
-                else {
-                    nFail = nTest;
-                    nTest = Math.trunc((nSucc + nTest) / 2);
-                }
-            }
-            expect(nSucc).to.be.at.above(2);
+                expect(nSucc).to.be.at.above(2);
+            });
         });
     });
 
@@ -455,8 +452,7 @@ contract("VreoTokenSale", accounts => {
         let iconiq, token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             iconiq = await IconiqToken.at(await sale.iconiqToken());
@@ -492,33 +488,44 @@ contract("VreoTokenSale", accounts => {
         describe("token purchase", () => {
 
             it("is forbidden, even for iconiq holders", async () => {
-                let buyer = accounts[0];
-                await iconiq.setBalance(buyer, await iconiq.totalSupply());
-                await reject.tx(sale.buyTokens(buyer, {from: buyer, value: 1}));
+                await iconiq.setBalance(investor, await iconiq.totalSupply());
+                await reject.tx(sale.buyTokens(investor, {from: investor, value: money.wei(1)}));
             });
         });
 
         describe("investor verification", () => {
 
             it("is possible", async () => {
-                let investor = random.address();
                 await sale.verifyInvestors([investor], {from: owner});
                 expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
+            });
+        });
+
+        describe("investment withdrawal", () => {
+
+            it("is forbidden", async () => {
+                await reject.tx(sale.withdrawInvestment({from: anyone}));
             });
         });
     });
 
     describe("during iconiq sale", () => {
         let iconiq, token, sale;
+        let value = money.ether(2);
+        let amount;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             iconiq = await IconiqToken.at(await sale.iconiqToken());
             await token.transferOwnership(sale.address, {from: owner});
             await time.increaseTo(ICONIQ_SALE_OPENING_TIME);
+            amount = value.mul(await sale.rate()).times(100 + BONUS_PCT_IN_ICONIQ_SALE).divToInt(100);
+        });
+
+        afterEach("invariant: token supply is below sale cap", async () => {
+            expect(await token.totalSupply()).to.be.bignumber.most(TOTAL_TOKEN_CAP_OF_SALE);
         });
 
         describe("time conditions", () => {
@@ -541,78 +548,87 @@ contract("VreoTokenSale", accounts => {
         });
 
         describe("maximum possible investment", () => {
-            const iconiqHolder = accounts[0];
 
             it("is zero for non iconiq holders", async () => {
                 expect(await sale.getIconiqMaxInvestment(anyone)).to.be.bignumber.zero;
             });
 
             it("is zero if iconiq balance is too small", async () => {
-                await iconiq.setBalance(iconiqHolder, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI - 1);
-                expect(await sale.getIconiqMaxInvestment(iconiqHolder)).to.be.bignumber.zero;
+                await iconiq.setBalance(investor, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI - 1);
+                expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.zero;
             });
 
             it("is one wei if iconiq balance is minimum value", async () => {
-                await iconiq.setBalance(iconiqHolder, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
-                expect(await sale.getIconiqMaxInvestment(iconiqHolder)).to.be.bignumber.equal(1);
+                await iconiq.setBalance(investor, ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
+                expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.equal(1);
             });
 
             it("is correctly calculated", async () => {
                 let maxInvestment = money.ether(42);
-                await iconiq.setBalance(iconiqHolder, maxInvestment.times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
-                expect(await sale.getIconiqMaxInvestment(iconiqHolder)).to.be.bignumber.equal(maxInvestment);
+                await iconiq.setBalance(investor, maxInvestment.times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
+                expect(await sale.getIconiqMaxInvestment(investor)).to.be.bignumber.equal(maxInvestment);
             });
         });
 
         describe("token purchase", () => {
-            const investor = accounts[0];
             let startState;
 
             before("save start state", async () => {
-                startState = await snapshot.create();
+                startState = await snapshot.new();
             });
 
-            beforeEach("restore start state", async () => {
-                await snapshot.revert(startState);
-                startState = await snapshot.create();
+            after("revert start state", async () => {
+                await startState.revert();
             });
 
-            afterEach("invariant: token supply is below sale cap", async () => {
-                expect(await token.totalSupply()).to.be.bignumber.most(TOTAL_TOKEN_CAP_OF_SALE);
+            beforeEach("restore start state and make investor an iconiq holder", async () => {
+                await startState.restore();
+                await iconiq.setBalance(investor, await iconiq.totalSupply());
             });
 
             it("is forbidden for non iconiq holders", async () => {
-                await reject.tx(sale.buyTokens(anyone, {from: anyone, value: 1}));
+                await reject.tx(sale.buyTokens(anyone, {from: anyone, value: money.wei(1)}));
             });
 
             it("is forbidden if beneficiary is not owner", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
-                await reject.tx(sale.buyTokens(anyone, {from: investor, value: 1}));
+                await reject.tx(sale.buyTokens(anyone, {from: investor, value: money.wei(1)}));
             });
 
             it("is forbidden if wei amount is zero", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
                 await reject.tx(sale.buyTokens(investor, {from: investor, value: 0}));
             });
 
             it("is forbidden if wei amount exceeds investment limit", async () => {
-                await iconiq.setBalance(investor, money.ether(3).times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
+                await iconiq.setBalance(investor, value.times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
                 let maxValue = await sale.getIconiqMaxInvestment(investor);
                 await reject.tx(sale.buyTokens(investor, {from: investor, value: maxValue.plus(1)}));
             });
 
             it("is forbidden if wei amount plus previously invested wei exceeds investment limit", async () => {
-                let value = money.ether(2);
                 let maxValue = value.times(2).minus(1);
                 await iconiq.setBalance(investor, maxValue.times(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI));
                 await sale.buyTokens(investor, {from: investor, value});
                 await reject.tx(sale.buyTokens(investor, {from: investor, value}));
             });
+        });
 
-            it("by unverified investors emits a TokenPurchase but no TokensDelivered event", async () => {
+        describe("token purchase by unverified investors", () => {
+            let startState;
+
+            before("save start state", async () => {
+                startState = await snapshot.new();
+            });
+
+            after("revert start state", async () => {
+                await startState.revert();
+            });
+
+            beforeEach("restore start state make investor an unverified iconiq holder", async () => {
+                await startState.restore();
                 await iconiq.setBalance(investor, await iconiq.totalSupply());
-                let value = money.ether(2);
-                let amount = value.times(await sale.rate()).times(100 + BONUS_PCT_IN_ICONIQ_SALE).divToInt(100);
+            });
+
+            it("emits a TokenPurchase but no TokensDelivered event", async () => {
                 let tx = await sale.buyTokens(investor, {from: investor, value});
                 let purchaseEntry = tx.logs.find(entry => entry.event === "TokenPurchase");
                 expect(purchaseEntry).to.exist;
@@ -624,24 +640,34 @@ contract("VreoTokenSale", accounts => {
                 expect(deliverEntry).to.not.exist;
             });
 
-            it("by unverified investors doesn't change the total supply", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
+            it("doesn't change the total supply", async () => {
                 let totalSupply = await token.totalSupply();
-                await sale.buyTokens(investor, {from: investor, value: money.ether(2)});
+                await sale.buyTokens(investor, {from: investor, value});
                 expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply);
             });
 
-            it("by unverified investors doesn't decrease remaining tokens", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
+            it("doesn't change the remaining tokens", async () => {
                 let remaining = await sale.remainingTokensForSale();
-                await sale.buyTokens(investor, {from: investor, value: money.ether(2)});
+                await sale.buyTokens(investor, {from: investor, value});
                 expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining);
             });
 
-            it("by unverified investors increases their total investment", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
+            it("increases the wei balance of sale contract", async () => {
+                let balance = await web3.eth.getBalance(sale.address);
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await web3.eth.getBalance(sale.address)).to.be.bignumber.equal(balance.plus(value));
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await web3.eth.getBalance(sale.address)).to.be.bignumber.equal(balance.plus(value.times(2)));
+            });
+
+            it("doesn't change the wei balance of wallet", async () => {
+                let balance = await web3.eth.getBalance(await sale.wallet());
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await web3.eth.getBalance(await sale.wallet())).to.be.bignumber.equal(balance);
+            });
+
+            it("increases the investor's total investment", async () => {
                 let invested = Investment(await sale.investments(investor)).totalWeiInvested;
-                let value = money.ether(2);
                 await sale.buyTokens(investor, {from: investor, value});
                 let invested1 = Investment(await sale.investments(investor)).totalWeiInvested;
                 expect(invested1).to.be.bignumber.equal(invested.plus(value));
@@ -650,11 +676,8 @@ contract("VreoTokenSale", accounts => {
                 expect(invested2).to.be.bignumber.equal(invested.plus(value.times(2)));
             });
 
-            it("by unverified investors increases their pending tokens", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
+            it("increases the investor's pending tokens", async () => {
                 let pending = Investment(await sale.investments(investor)).pendingTokenAmount;
-                let value = money.ether(2);
-                let amount = value.mul(await sale.rate()).times(100 + BONUS_PCT_IN_ICONIQ_SALE).divToInt(100);
                 await sale.buyTokens(investor, {from: investor, value});
                 let pending1 = Investment(await sale.investments(investor)).pendingTokenAmount;
                 expect(pending1).to.be.bignumber.equal(pending.plus(amount));
@@ -663,19 +686,192 @@ contract("VreoTokenSale", accounts => {
                 expect(pending2).to.be.bignumber.equal(pending.plus(amount.times(2)));
             });
 
-            /*
-            it("by unverified investors does not decrease remaining tokens", async () => {
-                await iconiq.setBalance(investor, await iconiq.totalSupply());
-                let remaining = await sale.remainingTokensForSale();
-                let value = money.ether(2);
-                let amount1 = value.mul(await sale.rate()).times(100 + BONUS_PCT_IN_ICONIQ_SALE).divToInt(100);
-                let amount2 = amount1.times(2);
+            it("doesn't change the investor's token balance", async () => {
+                let balance = await token.balanceOf(investor);
                 await sale.buyTokens(investor, {from: investor, value});
-                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount1));
-                await sale.buyTokens(investor, {from: investor, value});
-                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount2));
+                expect(await token.balanceOf(investor)).to.be.bignumber.equal(balance);
             });
-            */
+        });
+
+        describe("token purchase by verified investors", () => {
+            let startState;
+
+            before("save start state", async () => {
+                startState = await snapshot.new();
+            });
+
+            after("revert start state", async () => {
+                await startState.revert();
+            });
+
+            beforeEach("restore start state and make investor a verified iconiq holder", async () => {
+                await startState.restore();
+                await iconiq.setBalance(investor, await iconiq.totalSupply());
+                await sale.verifyInvestors([investor], {from: owner});
+            });
+
+            it("emits a TokenPurchase and a TokensDelivered event", async () => {
+                let tx = await sale.buyTokens(investor, {from: investor, value});
+                let purchaseEntry = tx.logs.find(entry => entry.event === "TokenPurchase");
+                expect(purchaseEntry).to.exist;
+                expect(purchaseEntry.args.purchaser).to.be.bignumber.equal(investor);
+                expect(purchaseEntry.args.beneficiary).to.be.bignumber.equal(investor);
+                expect(purchaseEntry.args.value).to.be.bignumber.equal(value);
+                expect(purchaseEntry.args.amount).to.be.bignumber.equal(amount);
+                let deliverEntry = tx.logs.find(entry => entry.event === "TokensDelivered");
+                expect(deliverEntry).to.exist;
+                expect(deliverEntry.args.investor).to.be.bignumber.equal(investor);
+                expect(deliverEntry.args.amount).to.be.bignumber.equal(amount);
+            });
+
+            it("increases the total supply", async () => {
+                let totalSupply = await token.totalSupply();
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount));
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount.times(2)));
+            });
+
+            it("decreases the remaining tokens", async () => {
+                let remaining = await sale.remainingTokensForSale();
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount.times(2)));
+            });
+
+            it("doesn't change the wei balance of sale contract", async () => {
+                let balance = await web3.eth.getBalance(sale.address);
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await web3.eth.getBalance(sale.address)).to.be.bignumber.equal(balance);
+            });
+
+            it("increases the wei balance of wallet", async () => {
+                let balance = await web3.eth.getBalance(await sale.wallet());
+                await sale.buyTokens(investor, {from: investor, value});
+                let balance1 = await web3.eth.getBalance(await sale.wallet());
+                expect(balance1).to.be.bignumber.equal(balance.plus(value));
+                await sale.buyTokens(investor, {from: investor, value});
+                let balance2 = await web3.eth.getBalance(await sale.wallet());
+                expect(balance2).to.be.bignumber.equal(balance.plus(value.times(2)));
+            });
+
+            it("increases the investor's total investment", async () => {
+                let invested = Investment(await sale.investments(investor)).totalWeiInvested;
+                await sale.buyTokens(investor, {from: investor, value});
+                let invested1 = Investment(await sale.investments(investor)).totalWeiInvested;
+                expect(invested1).to.be.bignumber.equal(invested.plus(value));
+                await sale.buyTokens(investor, {from: investor, value});
+                let invested2 = Investment(await sale.investments(investor)).totalWeiInvested;
+                expect(invested2).to.be.bignumber.equal(invested.plus(value.times(2)));
+            });
+
+            it("doesn't change the investor's pending tokens from zero", async () => {
+                expect(Investment(await sale.investments(investor)).pendingTokenAmount).to.be.bignumber.zero;
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(Investment(await sale.investments(investor)).pendingTokenAmount).to.be.bignumber.zero;
+            });
+
+            it("increases the investor's token balance", async () => {
+                let balance = await token.balanceOf(investor);
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await token.balanceOf(investor)).to.be.bignumber.equal(balance.plus(amount));
+                await sale.buyTokens(investor, {from: investor, value});
+                expect(await token.balanceOf(investor)).to.be.bignumber.equal(balance.plus(amount.times(2)));
+            });
+        });
+
+        describe("investor verification", () => {
+            let startState;
+
+            before("save start state", async () => {
+                startState = await snapshot.new();
+            });
+
+            after("revert start state", async () => {
+                await startState.revert();
+            });
+
+            beforeEach("restore start state and make investor an unverified iconiq holder", async () => {
+                await startState.restore();
+                await iconiq.setBalance(investor, await iconiq.totalSupply());
+                await sale.buyTokens(investor, {from: investor, value});
+            });
+
+            it("emits a TokensDelivered event", async () => {
+                let tx = await sale.verifyInvestors([investor], {from: owner});
+                let entry = tx.logs.find(entry => entry.event === "TokensDelivered");
+                expect(entry).to.exist;
+                expect(entry.args.investor).to.be.bignumber.equal(investor);
+                expect(entry.args.amount).to.be.bignumber.equal(amount);
+            });
+
+            it("increases the total supply", async () => {
+                let totalSupply = await token.totalSupply();
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.plus(amount));
+            });
+
+            it("decreases the remaining tokens", async () => {
+                let remaining = await sale.remainingTokensForSale();
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
+            });
+
+            it("decreases the wei balance of sale contract", async () => {
+                let balance = await web3.eth.getBalance(sale.address);
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(await web3.eth.getBalance(sale.address)).to.be.bignumber.equal(balance.minus(value));
+            });
+
+            it("increases the wei balance of wallet", async () => {
+                let balance = await web3.eth.getBalance(await sale.wallet());
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(await web3.eth.getBalance(await sale.wallet())).to.be.bignumber.equal(balance.plus(value));
+            });
+
+            it("doesn't change the investor's total investment", async () => {
+                let invested = Investment(await sale.investments(investor)).totalWeiInvested;
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(Investment(await sale.investments(investor)).totalWeiInvested).to.be.bignumber.equal(invested);
+            });
+
+            it("sets the investor's pending tokens to zero", async () => {
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(Investment(await sale.investments(investor)).pendingTokenAmount).to.be.bignumber.zero;
+            });
+
+            it("increases the investor's token balance", async () => {
+                let balance = await token.balanceOf(investor);
+                await sale.verifyInvestors([investor], {from: owner});
+                expect(await token.balanceOf(investor)).to.be.bignumber.equal(balance.plus(amount));
+            });
+        });
+
+        describe("investment withdrawal", () => {
+            let startState;
+
+            before("save start state", async () => {
+                startState = await snapshot.new();
+            });
+
+            after("revert start state", async () => {
+                await startState.revert();
+            });
+
+            beforeEach("restore start state", async () => {
+                await startState.restore();
+                await iconiq.setBalance(investor, await iconiq.totalSupply());
+                await sale.buyTokens(investor, {from: investor, value});
+            });
+
+            it("is forbidden", async () => {
+                await reject.tx(sale.withdrawInvestment({from: anyone}));
+            });
+        });
+
+        describe("token burning", () => {
+
         });
     });
 
@@ -683,8 +879,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -715,8 +910,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -747,8 +941,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -779,8 +972,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -811,8 +1003,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -843,8 +1034,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});
@@ -875,8 +1065,7 @@ contract("VreoTokenSale", accounts => {
         let token, sale;
 
         before("deploy", async () => {
-            await snapshot.revert(initialState);
-            initialState = await snapshot.create();
+            await initialState.restore();
             sale = await deployTokenSale();
             token = await VreoToken.at(await sale.token());
             await token.transferOwnership(sale.address, {from: owner});

@@ -178,7 +178,19 @@ module.exports = (() => {
                         });
                 });
 
-        return {create, revert};
+        // Snapshot object
+        const $ = async () => {
+            let id = await create();
+            return {
+                revert: () => revert(id),
+                restore: async () => {
+                    await revert(id);
+                    id = await create();
+                }
+            };
+        };
+
+        return {create, revert, new: $};
     })();
 
     // Logging colors.
