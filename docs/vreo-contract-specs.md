@@ -131,6 +131,10 @@ Project Timeline
   |           2018-09-01 | End of KYC period, Finalization possible          |
 
 
+Smart Contract Timeline
+=======================
+
+
   |Date                     | Event                                       |
   |-------------------------|---------------------------------------------|
   |2018-07-01 10:00:00 CEST | ICONIQ sale opening time                    |
