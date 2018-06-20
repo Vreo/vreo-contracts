@@ -92,9 +92,8 @@ The token sale consists of the two stages ICONIQ sale and VREO sale
 Private Presale
 ---------------
 
-At any time before the end of the VREO sale, tokens can be issued  
-to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses.
- |
+At any time before the end of the VREO sale, tokens can be issued to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses.
+
 ICONIQ sale
 -----------
 
