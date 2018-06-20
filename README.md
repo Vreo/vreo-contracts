@@ -37,12 +37,12 @@ The VREO sale has 3 phases. In the first phase there will be a bonus of 20 % in 
 Timeline
 --------
 
-|Date                    | |Event                                       |
-|------------------------| |--------------------------------------------|
-|2018-07-01 10:00:00 CEST| |ICONIQ sale opening time                    |
-|2018-07-14 22:00:00 CEST| |ICONIQ sale closing time                    |
-|2018-07-21 10:00:00 CEST| |VREO sale opening time                      |
-|2018-07-24 22:00:00 CEST| |VREO end of phase one                       |
-|2018-08-01 22:00:00 CEST| |VREO end of phase two                       |
-|2018-08-18 22:00:00 CEST| |VREO sale closing time                      |
-|2018-09-01 22:00:00 CEST| |end of KYC verification                     |
+|Date                     |Event                                        |
+|-------------------------|---------------------------------------------|
+|2018-07-01 10:00:00 CEST | ICONIQ sale opening time                    |
+|2018-07-14 22:00:00 CEST | ICONIQ sale closing time                    |
+|2018-07-21 10:00:00 CEST | VREO sale opening time                      |
+|2018-07-24 22:00:00 CEST | VREO end of phase one                       |
+|2018-08-01 22:00:00 CEST | VREO end of phase two                       |
+|2018-08-18 22:00:00 CEST | VREO sale closing time                      |
+|2018-09-01 22:00:00 CEST | end of KYC verification                     |

@@ -70,17 +70,17 @@ There is a sanity check, that allows to change the rate only by one order of mag
 Token pools
 -----------
 
-  |Pool           | |          Cap|  |distribution time                        |
-  |---------------| |-------------|  |-----------------------------------------|
-  |private Presale| |       no cap|  |any time before end of Vreo sale         |
-  |ICONIQ sale	  | |       no cap|  |between start and end date of ICONIQ sale|
-  |Vreo sale      | |       no cap|  |between start and end date of Vreo sale  |
-  |total sale     | |  450,000,000|  |before end of VREO sale                  |
-  |Bounty         | |   50,000,000|  |at finalization                          |
-  |Team           | |   85,000,000|  |at finalization                          |
-  |Legals         | |   57,000,000|  |at finalization                          |
-  |Advisors       | |   58,000,000|  |at finalization                          |
-  |Token Cap      | |  700,000,000|  |                                         |
+  |Pool            |           Cap |distribution time                         |
+  |----------------|---------------|------------------------------------------|
+  |private Presale |        no cap | any time before end of Vreo sale         |
+  |ICONIQ sale	   |        no cap | between start and end date of ICONIQ sale|
+  |Vreo sale       |        no cap | between start and end date of Vreo sale  |
+  |total sale      |   450,000,000 | before end of VREO sale                  |
+  |Bounty          |    50,000,000 | at finalization                          |
+  |Team            |    85,000,000 | at finalization                          |
+  |Legals          |    57,000,000 | at finalization                          |
+  |Advisors        |    58,000,000 | at finalization                          |
+  |Token Cap       |   700,000,000 |                                          |
 
 
 
@@ -94,7 +94,7 @@ Private Presale
 
 At any time before the end of the VREO sale, tokens can be issued  
 to private presale investors by the owner of the token sale contract. The token sale contract can process a lists containing the amounts of tokens assigned to presale buyer addresses.
-
+ |
 ICONIQ sale
 -----------
 
@@ -120,27 +120,26 @@ Project Timeline
 ================
 
 
-  |Date                 | |Event                                             |
-  |---------------------| |--------------------------------------------------|
-  |           2018-06-30| |Token contract deployment                         |
-  |                     | |Bounty contract deployment                        |
-  |                     | |Token sale contract deployment                    |
-  |                     | |Transfer of token ownership to token sale contract|
-  |                     | |Etherscan code verification                       |
-  |           2018-07-01| |Start of ICONIQ sale                              |
-  |           2018-08-18| |End of VREO sale                                  |
-  |           2018-09-01| |End of KYC period, Finalization possible          |
+  |Date                  | Event                                             | |----------------------|---------------------------------------------------|
+  |           2018-06-30 | Token contract deployment                         |
+  |                      | Bounty contract deployment                        |
+  |                      | Token sale contract deployment                    |
+  |                      | Transfer of token ownership to token sale contract|
+  |                      | Etherscan code verification                       |
+  |           2018-07-01 | Start of ICONIQ sale                              |
+  |           2018-08-18 | End of VREO sale                                  |
+  |           2018-09-01 | End of KYC period, Finalization possible          |
 
 
-  |Date                    | |Event                                       |
-  |------------------------| |--------------------------------------------|
-  |2018-07-01 10:00:00 CEST| |ICONIQ sale opening time                    |
-  |2018-07-14 22:00:00 CEST| |ICONIQ sale closing time                    |
-  |2018-07-21 10:00:00 CEST| |VREO sale opening time                      |
-  |2018-07-24 22:00:00 CEST| |VREO end of phase one                       |
-  |2018-08-01 22:00:00 CEST| |VREO end of phase two                       |
-  |2018-08-18 22:00:00 CEST| |VREO sale closing time                      |
-  |2018-09-01 22:00:00 CEST| |end of KYC verification                     |
+  |Date                     | Event                                       |
+  |-------------------------|---------------------------------------------|
+  |2018-07-01 10:00:00 CEST | ICONIQ sale opening time                    |
+  |2018-07-14 22:00:00 CEST | ICONIQ sale closing time                    |
+  |2018-07-21 10:00:00 CEST | VREO sale opening time                      |
+  |2018-07-24 22:00:00 CEST | VREO end of phase one                       |
+  |2018-08-01 22:00:00 CEST | VREO end of phase two                       |
+  |2018-08-18 22:00:00 CEST | VREO sale closing time                      |
+  |2018-09-01 22:00:00 CEST | end of KYC verification                     |
 
 
 Deployment Requirements
@@ -149,13 +148,13 @@ Deployment Requirements
 The following requirements have to be fulfilled at deployment time
 2018-06-30:
 
-|Requirement                | |Source         Value
-|---------------------------| |------| |------------------------------------------|
-|address of ICONIQ token    | |ICONIQ| |0xB3e2Cb7CccfE139f8FF84013823Bf22dA6B6390A|   
-|ICONIQ token needed per Wei| |ICONIQ| |                                          |
-|Token sale contract owner  | |VREO  | |                                          |
-|Main ICO wallet            | |VREO  | |                                          |
-|Advisors wallet            | |VREO  | |                                          |
-|Team wallet                | |VREO  | |                                          |
-|Legals wallet              | |VREO  | |                                          |
-|Address of bounty owner    | |VREO  | |                                          |
+|Requirement                | Source |       Value                              |
+|---------------------------|--------|------------------------------------------|
+|address of ICONIQ token    | ICONIQ |0xB3e2Cb7CccfE139f8FF84013823Bf22dA6B6390A|   
+|ICONIQ token needed per Wei| ICONIQ |                                          |
+|Token sale contract owner  | VREO   |                                          |
+|Main ICO wallet            | VREO   |                                          |
+|Advisors wallet            | VREO   |                                          |
+|Team wallet                | VREO   |                                          |
+|Legals wallet              | VREO   |                                          |
+|Address of bounty owner    | VREO   |                                          |
