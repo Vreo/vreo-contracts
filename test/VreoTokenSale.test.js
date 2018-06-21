@@ -9,7 +9,13 @@ const {expect} = require("chai").use(require("chai-bignumber")(BN));
 const {random, time, money, reject, snapshot, logGas} = require("./helpers/common");
 
 
-contract("VreoTokenSale", ([owner, iconiqHolder, unverifiedInvestor, verifiedInvestor, verifyingInvestor, anyone]) => {
+contract("VreoTokenSale", ([owner,               // owner of contracts
+                            iconiqHolder,        // investor who owns iconiq tokens
+                            unverifiedInvestor,  // unverified investor (holds iconiq tokens)
+                            verifiedInvestor,    // verfied investor (holds iconiq tokens)
+                            verifyingInvestor,   // unverified investor who bought tokens and as going to be verified
+                            anyone,              // anyone else
+                            ]) => {
     // Constants: token amounts               M  k  1
     const TOTAL_TOKEN_CAP         = new BN("700000000e18");
     const TOTAL_TOKEN_CAP_OF_SALE = new BN("450000000e18");
