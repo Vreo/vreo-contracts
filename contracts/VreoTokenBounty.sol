@@ -19,8 +19,8 @@ contract VreoTokenBounty is Ownable {
     }
 
     /// @dev Distribute tokens
-    /// @param _recipients A list where each entry is an Ethereum address
-    /// @param _amounts A list where each entry is a positive number
+    /// @param _recipients A list of addresses of bounty recipients
+    /// @param _amounts A list of bounty amounts 
     function distributeTokens(address[] _recipients, uint[] _amounts) public onlyOwner {
         require(_recipients.length == _amounts.length);
 
