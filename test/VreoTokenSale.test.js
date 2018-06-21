@@ -335,7 +335,7 @@ contract("VreoTokenSale", ([owner,               // owner of contracts
                 expect(await sale.remainingTokensForSale()).to.be.bignumber.equal(remaining.minus(amount));
             });
 
-            it.skip("is possible for many (i.e. > 2) investors at once", async () => {
+            it("is possible for many (i.e. > 2) investors at once", async () => {
                 await logGas(sale.distributePresale([], [], {from: owner}), "no investors");
                 let nSucc = 0;
                 let nFail = -1;
@@ -423,7 +423,7 @@ contract("VreoTokenSale", ([owner,               // owner of contracts
                 expect(Investment(await sale.investments(investor)).isVerified).to.be.true;
             });
 
-            it.skip("is possible for many (i.e. > 2) investors at once", async () => {
+            it("is possible for many (i.e. > 2) investors at once", async () => {
                 await logGas(sale.verifyInvestors([], {from: owner}), "no investors");
                 let nSucc = 0;
                 let nFail = -1;

@@ -75,7 +75,7 @@ contract("VreoTokenSale", ([owner, anyone]) => {
             expect(await token.balanceOf(recipient)).to.be.bignumber.equal(balance.plus(amount));
         });
 
-        it.skip("is possible for many (i.e. > 2) recipients at once", async () => {
+        it("is possible for many (i.e. > 2) recipients at once", async () => {
             await logGas(bounty.distributeTokens([], [], {from: owner}), "no recipients");
             let nSucc = 0;
             let nFail = -1;
