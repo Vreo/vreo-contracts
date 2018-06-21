@@ -14,8 +14,9 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
         // amount of token an unverified investor bought. should be zero for verified investors
         uint pendingTokenAmount;
     }
+
     // total amount of wei held by unverified investors should never be larger than this.balance
-    uint pendingWeiAmount = 0;
+    uint public pendingWeiAmount = 0;
 
     // maps investor addresses to investment information
     mapping(address => Investment) public investments;
@@ -100,13 +101,12 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
         Investment storage investment = investments[msg.sender];
         investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
 
-        // If the investor's KYC is already verified we issue the tokens imediatly
         if (investment.isVerified) {
+            // If the investor's KYC is already verified we issue the tokens imediatly
             _deliverTokens(_beneficiary, _tokenAmount);
             emit TokensDelivered(_beneficiary, _tokenAmount);
-        }
-        // If the investor's KYC is not verified we store the pending token amount
-        else {
+        } else {
+            // If the investor's KYC is not verified we store the pending token amount
             investment.pendingTokenAmount = investment.pendingTokenAmount.add(_tokenAmount);
             pendingWeiAmount = pendingWeiAmount.add(msg.value);
         }
