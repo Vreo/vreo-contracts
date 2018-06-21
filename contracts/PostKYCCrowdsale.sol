@@ -17,21 +17,21 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     mapping(address => Investment) public investments;
 
     /// @dev Log entry on investor verified
-    /// @param investor the investors Ethereum address
+    /// @param investor the investor's Ethereum address
     event InvestorVerified(address investor);
 
     /// @dev Log entry on tokens delivered
-    /// @param investor the investors Ethereum address
+    /// @param investor the investor's Ethereum address
     /// @param amount A positive number
     event TokensDelivered(address investor, uint amount);
 
     /// @dev Log entry on investment withdrawn
-    /// @param investor the investors Ethereum address
+    /// @param investor the investor's Ethereum address
     /// @param value A positive number
     event InvestmentWithdrawn(address investor, uint value);
 
     /// @dev Verify investors
-    /// @param _investors list of investors Ethereum addresses
+    /// @param _investors list of investors' Ethereum addresses
     function verifyInvestors(address[] _investors) public onlyOwner {
         for (uint i = 0; i < _investors.length; ++i) {
             address investor = _investors[i];
