@@ -10,10 +10,14 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
 
     struct Investment {
         bool isVerified;         // wether or not the investor passed the KYC process
-        uint totalWeiInvested;   // invested wei
-        uint pendingTokenAmount; // amount of token quantums the investor wants to purchase
+        uint totalWeiInvested;   // total invested wei regardless of verification state
+        // amount of token an unverified investor bought. should be zero for verified investors
+        uint pendingTokenAmount;
     }
+    // total amount of wei held by unverified investors should never be larger than this.balance
+    uint pendingWeiAmount = 0;
 
+    // maps investor addresses to investment information
     mapping(address => Investment) public investments;
 
     /// @dev Log entry on investor verified
@@ -22,12 +26,12 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
 
     /// @dev Log entry on tokens delivered
     /// @param investor the investor's Ethereum address
-    /// @param amount A positive number
+    /// @param amount token amount delivered
     event TokensDelivered(address investor, uint amount);
 
     /// @dev Log entry on investment withdrawn
     /// @param investor the investor's Ethereum address
-    /// @param value A positive number
+    /// @param value the wei amount withdrawn
     event InvestmentWithdrawn(address investor, uint value);
 
     /// @dev Verify investors
@@ -43,14 +47,14 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
                 emit InvestorVerified(investor);
 
                 uint pendingTokenAmount = investment.pendingTokenAmount;
-
+                // now we issue tokens to the verfied investor
                 if (pendingTokenAmount > 0) {
                     investment.pendingTokenAmount = 0;
 
                     _forwardFunds(investment.totalWeiInvested);
                     _deliverTokens(investor, pendingTokenAmount);
 
-                   emit TokensDelivered(investor, pendingTokenAmount);
+                    emit TokensDelivered(investor, pendingTokenAmount);
                 }
             }
         }
@@ -70,35 +74,41 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
         investment.totalWeiInvested = 0;
         investment.pendingTokenAmount = 0;
 
+        pendingWeiAmount = pendingWeiAmount.sub(totalWeiInvested);
+
         msg.sender.transfer(totalWeiInvested);
 
         emit InvestmentWithdrawn(msg.sender, totalWeiInvested);
+
+        assert(pendingWeiAmount <= address(this).balance);
     }
 
-    /// @dev Pre validate purchase
-    /// @param _beneficiary An Ethereum address
-    /// @param _weiAmount A positive number
+    /// @dev Prevalidate purchase
+    /// @param _beneficiary the investor's Ethereum address
+    /// @param _weiAmount the wei amount invested
     function _preValidatePurchase(address _beneficiary, uint _weiAmount) internal {
+        // We only want the msg.sender to buy tokens
         require(_beneficiary == msg.sender);
 
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
 
     /// @dev Process purchase
-    /// @param _beneficiary An Ethereum address
-    /// @param _tokenAmount A positive number
+    /// @param _beneficiary the investor's Ethereum address
+    /// @param _tokenAmount the token amount purchased
     function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
         Investment storage investment = investments[msg.sender];
         investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
 
-        // If the investors KYC is already verified we issue the tokens imediatly
+        // If the investor's KYC is already verified we issue the tokens imediatly
         if (investment.isVerified) {
             _deliverTokens(_beneficiary, _tokenAmount);
             emit TokensDelivered(_beneficiary, _tokenAmount);
         }
-        // If the investors KYC is not verified we store the pending token amount
+        // If the investor's KYC is not verified we store the pending token amount
         else {
             investment.pendingTokenAmount = investment.pendingTokenAmount.add(_tokenAmount);
+            pendingWeiAmount = pendingWeiAmount.add(msg.value);
         }
     }
 
@@ -112,9 +122,19 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Forward funds
-    /// @param _weiAmount A positive number
+    /// @param _weiAmount the amount to be transfered
     function _forwardFunds(uint _weiAmount) internal {
+        pendingWeiAmount = pendingWeiAmount.sub(_weiAmount);
         wallet.transfer(_weiAmount);
+    }
+
+    /// @dev Postvalidate purchase
+    /// @param _beneficiary the investor's Ethereum address
+    /// @param _weiAmount the amount invested
+    function _postValidatePurchase(address _beneficiary, uint _weiAmount) internal {
+        super._postValidatePurchase(_beneficiary, _weiAmount);
+        // checking invariant
+        assert(pendingWeiAmount <= address(this).balance);
     }
 
 }

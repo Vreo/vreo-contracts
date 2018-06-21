@@ -37,28 +37,31 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     // Amount of ICONIQ token investors need per Wei invested in ICONIQ PreSale.
     uint public constant ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500;
 
-    // Addresses
+    // ICONIQ Token
     ERC20Basic public iconiqToken;
+
+    // addresses token shares are minted to in finalization
     address public teamAddress;
     address public advisorsAddress;
     address public legalsAddress;
     address public bountyAddress;
 
+    // Amount of token available for purchase
     uint public remainingTokensForSale;
 
     /// @dev Log entry on rate changed
-    /// @param newRate A positive number
+    /// @param newRate the new rate
     event RateChanged(uint newRate);
 
     /// @dev Constructor
     /// @param _token A VreoToken
-    /// @param _rate A positive number
+    /// @param _rate the initial rate.
     /// @param _iconiqToken An IconiqInterface
-    /// @param _teamAddress An Ethereum address
-    /// @param _advisorsAddress An Ethereum address
-    /// @param _legalsAddress An Ethereum address
+    /// @param _teamAddress Ethereum address of Team
+    /// @param _advisorsAddress Ethereum address of Advisors
+    /// @param _legalsAddress Ethereum address of Legals
     /// @param _bountyAddress A VreoTokenBounty
-    /// @param _wallet An Ethereum address
+    /// @param _wallet MultiSig wallet address the ETH is forwarded to.
     constructor(
         VreoToken _token,
         uint _rate,
@@ -97,8 +100,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Distribute presale
-    /// @param _investors A list where each entry is an Ethereum address
-    /// @param _amounts A list where each entry is a positive number
+    /// @param _investors  list of investor addresses
+    /// @param _amounts  list of token amounts purchased by investors
     function distributePresale(address[] _investors, uint[] _amounts) public onlyOwner {
         require(!hasClosed());
         require(_investors.length == _amounts.length);
@@ -114,7 +117,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Set rate
-    /// @param _newRate A positive number
+    /// @param _newRate the new rate
     function setRate(uint _newRate) public onlyOwner {
         // A rate change by a magnitude order of ten and above is rather a typo than intention.
         // If it was indeed desired, several setRate transactions have to be sent.
@@ -124,18 +127,20 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
 
         emit RateChanged(_newRate);
     }
-    /// @dev unverified investors can withdraw their money after the Sale ended
 
+    /// @dev unverified investors can withdraw their money only after the VREO Sale ended
     function withdrawInvestment() public {
         require(hasClosed());
 
         super.withdrawInvestment();
     }
+
     /// @dev Is the sale for ICONIQ investors ongoing?
     /// @return bool
     function iconiqSaleOngoing() public view returns (bool) {
         return ICONIQ_SALE_OPENING_TIME <= now && now <= ICONIQ_SALE_CLOSING_TIME;
     }
+
     /// @dev Is the Vreo main sale ongoing?
     /// @return bool
     function vreoSaleOngoing() public view returns (bool) {
@@ -143,10 +148,9 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Get maximum possible wei investment while Iconiq sale
-    /// @param _investor An Ethereum address
+    /// @param _investor an investors Ethereum address
     /// @return Maximum allowed wei investment
     function getIconiqMaxInvestment(address _investor) public view returns (uint) {
-
         uint iconiqBalance = iconiqToken.balanceOf(_investor);
         uint prorataLimit = iconiqBalance.div(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
 
@@ -155,8 +159,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Pre validate purchase
-    /// @param _beneficiary An Ethereum address
-    /// @param _weiAmount A positive number
+    /// @param _beneficiary an investors Ethereum address
+    /// @param _weiAmount wei amount invested
     function _preValidatePurchase(address _beneficiary, uint _weiAmount) internal {
         super._preValidatePurchase(_beneficiary, _weiAmount);
 
@@ -164,8 +168,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Get token amount
-    /// @param _weiAmount A positive number
-    /// @return A positive number
+    /// @param _weiAmount wei amount invested
+    /// @return token amount with bonus
     function _getTokenAmount(uint _weiAmount) internal view returns (uint) {
         uint tokenAmount = super._getTokenAmount(_weiAmount);
 
@@ -185,8 +189,8 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     }
 
     /// @dev Deliver tokens
-    /// @param _beneficiary An Ethereum address
-    /// @param _tokenAmount A positive number
+    /// @param _beneficiary an investors Ethereum address
+    /// @param _tokenAmount token amount to deliver
     function _deliverTokens(address _beneficiary, uint _tokenAmount) internal {
         remainingTokensForSale = remainingTokensForSale.sub(_tokenAmount);
 

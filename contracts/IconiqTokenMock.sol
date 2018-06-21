@@ -2,6 +2,7 @@ pragma solidity 0.4.24;
 
 import "../zeppelin/math/SafeMath.sol";
 
+// Only for testing purposes
 
 contract IconiqTokenMock {
     using SafeMath for uint;
@@ -21,5 +22,3 @@ contract IconiqTokenMock {
     }
 
 }
-
-
