@@ -95,16 +95,15 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Process purchase
-    /// @param _beneficiary the investor's Ethereum address
     /// @param _tokenAmount the token amount purchased
-    function _processPurchase(address _beneficiary, uint _tokenAmount) internal {
+    function _processPurchase(address, uint _tokenAmount) internal {
         Investment storage investment = investments[msg.sender];
         investment.totalWeiInvested = investment.totalWeiInvested.add(msg.value);
 
         if (investment.isVerified) {
             // If the investor's KYC is already verified we issue the tokens imediatly
-            _deliverTokens(_beneficiary, _tokenAmount);
-            emit TokensDelivered(_beneficiary, _tokenAmount);
+            _deliverTokens(msg.sender, _tokenAmount);
+            emit TokensDelivered(msg.sender, _tokenAmount);
         } else {
             // If the investor's KYC is not verified we store the pending token amount
             investment.pendingTokenAmount = investment.pendingTokenAmount.add(_tokenAmount);
@@ -129,10 +128,9 @@ contract PostKYCCrowdsale is Crowdsale, Ownable {
     }
 
     /// @dev Postvalidate purchase
-    /// @param _beneficiary the investor's Ethereum address
     /// @param _weiAmount the amount invested
-    function _postValidatePurchase(address _beneficiary, uint _weiAmount) internal {
-        super._postValidatePurchase(_beneficiary, _weiAmount);
+    function _postValidatePurchase(address, uint _weiAmount) internal {
+        super._postValidatePurchase(msg.sender, _weiAmount);
         // checking invariant
         assert(pendingWeiAmount <= address(this).balance);
     }
