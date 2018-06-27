@@ -39,7 +39,7 @@ contract("VreoTokenSale", ([owner,               // owner of contracts
     const KYC_VERIFICATION_END_TIME  = time.from("2018-09-01 22:00:00 +2");
 
     // Constants: iconiq sale constraint
-    const ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500;
+    const ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 450;
 
     // Helper function: default deployment parameters
     const defaultParams = () => {
@@ -2353,4 +2353,3 @@ contract("VreoTokenSale", ([owner,               // owner of contracts
     });
 
 });
-
