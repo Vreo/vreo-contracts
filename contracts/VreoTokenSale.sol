@@ -113,6 +113,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
             totalAmount = totalAmount.add(_amounts[i]);
         }
 
+        require(remainingTokensForSale >= totalAmount);
         remainingTokensForSale = remainingTokensForSale.sub(totalAmount);
     }
 
@@ -155,6 +156,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         uint prorataLimit = iconiqBalance.div(ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI);
 
         // Substract Wei amount already invested.
+        require(prorataLimit >= investments[_investor].totalWeiInvested);
         return prorataLimit.sub(investments[_investor].totalWeiInvested);
     }
 
@@ -192,6 +194,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     /// @param _beneficiary an investors Ethereum address
     /// @param _tokenAmount token amount to deliver
     function _deliverTokens(address _beneficiary, uint _tokenAmount) internal {
+        require(remainingTokensForSale >= _tokenAmount);
         remainingTokensForSale = remainingTokensForSale.sub(_tokenAmount);
 
         super._deliverTokens(_beneficiary, _tokenAmount);
