@@ -35,7 +35,7 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     uint public constant KYC_VERIFICATION_END_TIME  = 1535832000;  // 2018-09-01 22:00:00 CEST
 
     // Amount of ICONIQ token investors need per Wei invested in ICONIQ PreSale.
-    uint public constant ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 500;
+    uint public constant ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 450;
 
     // ICONIQ Token
     ERC20Basic public iconiqToken;
