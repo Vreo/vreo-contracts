@@ -49,3 +49,10 @@ Timeline
 | 2018-08-01 22:00:00 CEST | VREO end of phase two                       |
 | 2018-08-18 22:00:00 CEST | VREO sale closing time                      |
 | 2018-09-01 22:00:00 CEST | end of KYC verification                     |
+
+
+Audit Report
+============
+
+In May 2018 the smart contracts were audited by [Solidified](https://solidified.io/).
+A copy of the [final audit report](https://github.com/solidified-platform/audits/blob/master/Audit%20Report%20-%20VREO%20%5B06.29.18%5D.pdf) is filed within `/docs`.
