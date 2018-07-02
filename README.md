@@ -54,5 +54,5 @@ Timeline
 Audit Report
 ============
 
-In May 2018 the smart contracts were audited by [Solidified](https://solidified.io/).
+In June 2018 the smart contracts were audited by [Solidified](https://solidified.io/).
 A copy of the [final audit report](https://github.com/solidified-platform/audits/blob/master/Audit%20Report%20-%20VREO%20%5B06.29.18%5D.pdf) is filed within `/docs`.
