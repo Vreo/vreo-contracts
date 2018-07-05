@@ -119,14 +119,14 @@ Project Timeline
 
   |Date                  | Event                                             |
   |----------------------|---------------------------------------------------|
-  |           2018-06-30 | Token contract deployment                         |
+  |           2018-07-05 | Token contract deployment                         |
   |                      | Bounty contract deployment                        |
   |                      | Token sale contract deployment                    |
   |                      | Transfer of token ownership to token sale contract|
   |                      | Etherscan code verification                       |
-  |           2018-07-01 | Start of ICONIQ sale                              |
-  |           2018-08-18 | End of VREO sale                                  |
-  |           2018-09-01 | End of KYC period, Finalization possible          |
+  |           2018-07-09 | Start of ICONIQ sale                              |
+  |           2018-09-01 | End of VREO sale                                  |
+  |           2018-09-15 | End of KYC period, Finalization possible          |
 
 
 Smart Contract Timeline
@@ -135,13 +135,13 @@ Smart Contract Timeline
 
   |Date                     | Event                                       |
   |-------------------------|---------------------------------------------|
-  |2018-07-01 10:00:00 CEST | ICONIQ sale opening time                    |
-  |2018-07-14 22:00:00 CEST | ICONIQ sale closing time                    |
-  |2018-07-21 10:00:00 CEST | VREO sale opening time                      |
-  |2018-07-24 22:00:00 CEST | VREO end of phase one                       |
-  |2018-08-01 22:00:00 CEST | VREO end of phase two                       |
-  |2018-08-18 22:00:00 CEST | VREO sale closing time                      |
-  |2018-09-01 22:00:00 CEST | end of KYC verification                     |
+  |2018-07-09 10:00:00 CEST | ICONIQ sale opening time                    |
+  |2018-07-23 22:00:00 CEST | ICONIQ sale closing time                    |
+  |2018-08-04 10:00:00 CEST | VREO sale opening time                      |
+  |2018-08-07 22:00:00 CEST | VREO end of phase one                       |
+  |2018-08-14 22:00:00 CEST | VREO end of phase two                       |
+  |2018-09-01 22:00:00 CEST | VREO sale closing time                      |
+  |2018-09-15 22:00:00 CEST | end of KYC verification                     |
 
 
 Deployment Requirements
@@ -153,13 +153,13 @@ The following requirements have to be fulfilled at deployment time
 |Requirement                | Source |       Value                              |
 |---------------------------|--------|------------------------------------------|
 |address of ICONIQ token    | ICONIQ |0xB3e2Cb7CccfE139f8FF84013823Bf22dA6B6390A|   
-|ICONIQ token needed per Wei| ICONIQ |                                          |
-|Token sale contract owner  | VREO   |                                          |
-|Main ICO wallet            | VREO   |                                          |
-|Advisors wallet            | VREO   |                                          |
-|Team wallet                | VREO   |                                          |
-|Legals wallet              | VREO   |                                          |
-|Address of bounty owner    | VREO   |                                          |
+|ICONIQ token needed per Wei| ICONIQ | 450                                      |
+|Token sale contract owner  | VREO   |0x4d1Fca0E78D7f5C6eDBc64206BcEFb4eEA0a72c3|
+|Main ICO wallet            | VREO   |0x850B320Ab48db9015F64c41F260283287E50D047|
+|Advisors wallet            | VREO   |0x021B92178144BDf2288F4986eFB7d06AAAdB19F8|
+|Team wallet                | VREO   |0x481481dd253fEd1888254805944c9412eb0A987D|
+|Legals wallet              | VREO   |0xa085ED2744ab0e502BD3694ffcB7610B54C627AD|
+|Address of bounty owner    | VREO   |0x4d1Fca0E78D7f5C6eDBc64206BcEFb4eEA0a72c3|
 
 Deployment method
 -----------------
