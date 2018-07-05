@@ -30,13 +30,13 @@ contract("VreoTokenSale", ([owner,               // owner of contracts
     const BONUS_PCT_IN_VREO_SALE_PHASE_2 = 10;
 
     // Constants: timing (CEST = UTC+2)
-    const ICONIQ_SALE_OPENING_TIME   = time.from("2018-07-01 10:00:00 +2");
-    const ICONIQ_SALE_CLOSING_TIME   = time.from("2018-07-14 22:00:00 +2");
-    const VREO_SALE_OPENING_TIME     = time.from("2018-07-21 10:00:00 +2");
-    const VREO_SALE_PHASE_1_END_TIME = time.from("2018-07-24 22:00:00 +2");
-    const VREO_SALE_PHASE_2_END_TIME = time.from("2018-08-01 22:00:00 +2");
-    const VREO_SALE_CLOSING_TIME     = time.from("2018-08-18 22:00:00 +2");
-    const KYC_VERIFICATION_END_TIME  = time.from("2018-09-01 22:00:00 +2");
+    const ICONIQ_SALE_OPENING_TIME   = time.from("2018-07-09 10:00:00 +2");
+    const ICONIQ_SALE_CLOSING_TIME   = time.from("2018-07-23 22:00:00 +2");
+    const VREO_SALE_OPENING_TIME     = time.from("2018-08-04 10:00:00 +2");
+    const VREO_SALE_PHASE_1_END_TIME = time.from("2018-08-07 22:00:00 +2");
+    const VREO_SALE_PHASE_2_END_TIME = time.from("2018-08-14 22:00:00 +2");
+    const VREO_SALE_CLOSING_TIME     = time.from("2018-09-01 22:00:00 +2");
+    const KYC_VERIFICATION_END_TIME  = time.from("2018-09-15 22:00:00 +2");
 
     // Constants: iconiq sale constraint
     const ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 450;

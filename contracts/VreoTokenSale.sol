@@ -26,13 +26,13 @@ contract VreoTokenSale is PostKYCCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     uint public constant BONUS_PCT_IN_VREO_SALE_PHASE_2 = 10;
 
     // Date/time constants
-    uint public constant ICONIQ_SALE_OPENING_TIME   = 1530432000;  // 2018-07-01 10:00:00 CEST
-    uint public constant ICONIQ_SALE_CLOSING_TIME   = 1531598400;  // 2018-07-14 22:00:00 CEST
-    uint public constant VREO_SALE_OPENING_TIME     = 1532160000;  // 2018-07-21 10:00:00 CEST
-    uint public constant VREO_SALE_PHASE_1_END_TIME = 1532462400;  // 2018-07-24 22:00:00 CEST
-    uint public constant VREO_SALE_PHASE_2_END_TIME = 1533153600;  // 2018-08-01 22:00:00 CEST
-    uint public constant VREO_SALE_CLOSING_TIME     = 1534622400;  // 2018-08-18 22:00:00 CEST
-    uint public constant KYC_VERIFICATION_END_TIME  = 1535832000;  // 2018-09-01 22:00:00 CEST
+    uint public constant ICONIQ_SALE_OPENING_TIME   = 1531123200;  // 2018-07-09 10:00:00 CEST
+    uint public constant ICONIQ_SALE_CLOSING_TIME   = 1532376000;  // 2018-07-23 22:00:00 CEST
+    uint public constant VREO_SALE_OPENING_TIME     = 1533369600;  // 2018-08-04 10:00:00 CEST
+    uint public constant VREO_SALE_PHASE_1_END_TIME = 1533672000;  // 2018-08-07 22:00:00 CEST
+    uint public constant VREO_SALE_PHASE_2_END_TIME = 1534276800;  // 2018-08-14 22:00:00 CEST
+    uint public constant VREO_SALE_CLOSING_TIME     = 1535832000;  // 2018-09-01 22:00:00 CEST
+    uint public constant KYC_VERIFICATION_END_TIME  = 1537041600;  // 2018-09-15 22:00:00 CEST
 
     // Amount of ICONIQ token investors need per Wei invested in ICONIQ PreSale.
     uint public constant ICONIQ_TOKENS_NEEDED_PER_INVESTED_WEI = 450;
