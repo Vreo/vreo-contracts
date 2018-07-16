@@ -59,8 +59,8 @@ Set Rate
 The token sale contract provides a function that enables the token
 contract owner to set the MERO Token price at any time. The
 price represents the MERO per ETH rate. With a target
-price of 0.05 € per MERO we will have a rate of
-approximately 9,000 according to a price of approximately 450 € per ETH.
+price of 0.05 $ per MERO we will have a rate of
+approximately 9,000 according to a price of approximately 450 $ per ETH.
 There is a sanity check, that allows to change the rate only by one order of magnitude up or down.
 
 
